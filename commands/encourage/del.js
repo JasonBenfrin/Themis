@@ -19,7 +19,8 @@ function del(interaction) {
   str = `Are you sure you want to delete ${interaction.options.getInteger('integer')}?`
 
   db.get('encourage').then(value => {
-    if(interaction.options.getInteger('integer')>=value.length) {
+    const integer = interaction.options.getInteger('integer')
+    if(integer >= value.length || integer < 0) {
       return interaction.reply('The provided integer does not exist!\n *Please check *`/encourage list`* for correct index*')
     }
 
