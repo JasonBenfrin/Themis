@@ -26,7 +26,7 @@ function lister(interaction){
         .setAuthor('Encourage Bot', 'https://i.imgur.com/l3vDws1.png')
         .setDescription('List of encouraging messages')
         .setTimestamp()
-        .setFooter('Bot Version: Release 1.0.0', 'https://i.imgur.com/l3vDws1.png')
+        .setFooter('Bot Version: Release 1.0.1', 'https://i.imgur.com/l3vDws1.png')
       str = ''
       count = 0
       loop: for (const msg in value) {

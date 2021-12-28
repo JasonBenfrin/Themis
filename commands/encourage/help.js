@@ -12,4 +12,4 @@ module.exports = help = new MessageEmbed()
     {name:'/encourage list',value:'Shows a list of messages gathered'}
   )
   .setTimestamp()
-  .setFooter('Bot Version: Beta 1.0', 'https://i.imgur.com/l3vDws1.png')
+  .setFooter('Bot Version: Release 1.0.1', 'https://i.imgur.com/l3vDws1.png')
