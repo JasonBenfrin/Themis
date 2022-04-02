@@ -1,12 +1,3 @@
 {
-  "files": {
-    "commands/encourage/list.js": [
-      {
-        "id": "10a99989-9dce-421a-bb71-fdfc76dabf0a",
-        "line": 79,
-        "version": 10179,
-        "index": 2269
-      }
-    ]
-  }
+  "files": {}
 }
