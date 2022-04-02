@@ -5,6 +5,7 @@ module.exports = {
     const index = require('../index')
     
     index.updateCommands()
+		index.client.list = new Map()
 
     index.db.get("encourage").then(value => {
       if(!value || value.length < 1){

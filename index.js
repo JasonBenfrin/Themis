@@ -33,6 +33,8 @@ for (const file of eventFiles) {
 
 process.on('unhandledRejection', () => {})
 
+// client.on('debug',(debug) => console.log(debug))
+
 keepAlive()
 module.exports = {client,updateCommands,db}
 client.login(token);

@@ -8,7 +8,6 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('encourage')
     .setDescription('Encouragement Commands')
-
     .addSubcommand(subcommand => 
       subcommand
         .setName('help')

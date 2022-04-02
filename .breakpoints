@@ -1,11 +1,11 @@
 {
   "files": {
-    "commands/bot info.js": [
+    "commands/encourage/list.js": [
       {
-        "id": "576be065-0923-454f-ae67-74d32751ef47",
-        "line": 8,
-        "version": 223,
-        "index": 222
+        "id": "10a99989-9dce-421a-bb71-fdfc76dabf0a",
+        "line": 79,
+        "version": 10179,
+        "index": 2269
       }
     ]
   }
