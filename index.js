@@ -33,6 +33,10 @@ for (const file of eventFiles) {
 
 // client.on('debug',(debug) => console.log(debug))
 
+process.on('uncaughtException', (err) => {
+	console.error(err)
+})
+
 keepAlive()
 module.exports = {client,updateCommands,db}
 client.login(token);

@@ -1,7 +1,9 @@
+const { sort } = require('../level/leaderboard.js')
+
 module.exports = {
   name: 'ready',
   once: true,
-  execute(){
+  async execute(){
     const index = require('../index')
     
     index.updateCommands()
@@ -12,5 +14,10 @@ module.exports = {
         index.db.set("encourage",['Everything will be fine.','Don\'t be sad, everything will be fine.','You are a great person so don\'t feel like that.','Cheer up mate!','It can be tough sometimes but you have to endure.','Come talk to me. You\'ll be happy again!'])
       }
     })
+		
+		const level = await index.db.get('lvl')
+		if(!level) await index.db.set('lvl',{})
+		index.client.spamDetect = new Map()
+		index.client.leaderBoard = await sort()
   }
 }

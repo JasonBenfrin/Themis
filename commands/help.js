@@ -16,7 +16,7 @@ const help = new MessageEmbed()
     {name:"/bot info",value:"Sends a link to bot\'s code"}
   )
   .setTimestamp()
-  .setFooter('Bot Version: Release 1.0.1', 'https://i.imgur.com/l3vDws1.png');
+  .setFooter(`Bot Version: Release ${process.env.version}`, 'https://i.imgur.com/l3vDws1.png');
 
 module.exports = {
 	data: new SlashCommandBuilder()

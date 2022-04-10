@@ -5,7 +5,7 @@ module.exports = {
 		.setName('bot-info')
 		.setDescription('Sends a link to bot\'s code'),
 	async execute(interaction) {
-		return interaction.reply(`Version: Release 1.0.1
+		return interaction.reply(`Version: Release ${process.env.version}
 		\n**Link to bot's code:**
 		\n[**Github - JasonBenfrin - Encourage-Bot**](<https://github.com/JasonBenfrin/Encourage-Bot> "Github")
 		\n[**Replit - JasonBenfin - Encourage-Bot**](<https://replit.com/@Bhone-MM/Encourage-Bot-js> "Replit")

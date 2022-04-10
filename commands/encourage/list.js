@@ -34,7 +34,7 @@ function createEmbed(msgToTen, offset) {
 		.setAuthor('Encourage Bot', 'https://i.imgur.com/l3vDws1.png')
 		.setDescription('List of encouraging messages')
 		.setTimestamp()
-		.setFooter('Bot Version: Release 1.0.1', 'https://i.imgur.com/l3vDws1.png')
+		.setFooter(`Bot Version: Release ${process.env.version}`, 'https://i.imgur.com/l3vDws1.png')
 	msgToTen.forEach(msg => {
 		embed.addField(`${offset}.  ${msg}`,'\u200B')
 		offset++
