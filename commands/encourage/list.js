@@ -36,6 +36,7 @@ function createEmbed(msgToTen, offset) {
 		.setTimestamp()
 		.setFooter(`Bot Version: Release ${process.env.version}`, 'https://i.imgur.com/l3vDws1.png')
 	msgToTen.forEach(msg => {
+		if(msg.length >= 256) msg = msg.substring(0,253)+'...'
 		embed.addField(`${offset}.  ${msg}`,'\u200B')
 		offset++
 	})

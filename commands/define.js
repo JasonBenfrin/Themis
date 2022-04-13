@@ -2,6 +2,12 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js')
 const http = require("https");
 
+function urlAdd(message) {
+	return message.replaceAll(/\[(.*?)\]/g, match => {
+		return match += `(<https://urbandictionary.com/define.php?term=${encodeURI(match.replace(/\[|\]/g,''))}>)`
+	})
+}
+
 function urban(interaction, callback) {
 	const uri = encodeURI(interaction.options.getString('word'))
 	const option = {
@@ -35,6 +41,13 @@ function urban(interaction, callback) {
 }
 
 function createEmbed(word, url, def, likes, dislikes, example, time, author) {
+	if(!example) example = 'No example.'
+	def = urlAdd(def)
+	example = urlAdd(example)
+	if(word.length >= 256) word = word.substring(0, 253)+'...'
+	if(def.length >= 1024) def = def.substring(0, 1021)+'...'
+	if(example.length >= 1024) example = example.substring(0, 1021)+'...'
+	if(author.length >= 256) author = author.substring(0, 253)+'...'
 	const embed = new MessageEmbed()
 		.setTitle(word)
 	  .setURL(url)
@@ -120,7 +133,7 @@ module.exports = {
 		.addStringOption(option => {
 			return option
 				.setName('word')
-				.setDescription('Word to be defined.')
+				.setDescription('Word to be defined. (Urban dictionary)')
 				.setRequired(true)
 		}),
 	async execute(interaction) {

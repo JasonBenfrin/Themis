@@ -81,7 +81,7 @@ module.exports = {
 			levelUp(message)
 			return spam.set(message.author.id, new Recent(new Date(), message.content))
 		}
-		if(new Date() - recent.time > 10000 && recent.msg != message.content) {
+		if(new Date() - recent.time > 60000 && recent.msg != message.content) {
 			levelUp(message)
 			return spam.set(message.author.id, new Recent(new Date(), message.content))
 		}
