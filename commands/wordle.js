@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders')
 const { MessageEmbed, MessageAttachment } = require('discord.js')
+const Database = require('@replit/database')
+const db = new Database()
 const Canvas = require('canvas')
 const fs = require('fs')
 
@@ -20,16 +22,31 @@ const offset2 = 5
 const radius = 8
 const rows = [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['Z','X','C','V','B','N','M']]
 
+class Wordle {
+	constructor(number, incomplete, wins, one, two, three, four, five, six) {
+		this.number = number
+		this.incomplete = incomplete
+		this.wins = wins
+		this.lost = number-incomplete-wins
+		this.one = one
+		this.two = two
+		this.three = three
+		this.four = four
+		this.five = five
+		this.six = six
+	}
+}
+
 function createEmbed(win, word) {
 	const embed = new MessageEmbed()
 		.setColor('#ffffff')
 		.setImage('attachment://wordle.png')
-		.setFooter(`Guess a 5 letter word.\nThe game will end after 20 minutes of inactivity.`)
+		.setFooter(`Guess a 5 letter word.\nThe game will end after 10 minutes of inactivity.`)
 	if(win === true) {
 		embed.setTitle('Brilliant!')
 	}else if(win === false){
 		embed.setTitle('Try again.')
-		embed.setDescription(`The correct word was ${word.charAt(0).toUpperCase()+word.slice(1)}.`)
+		embed.setDescription(`The correct word was **${word.charAt(0).toUpperCase()+word.slice(1)}**.`)
 	}else{
 		embed.setTitle('Guess...')
 	}
@@ -109,7 +126,9 @@ function keyboardCanvas(guesses) {
 }
 
 async function collect(interaction, word, interact) {
+	let state;
 	const filter = m => {
+		m.content = m.content.toLowerCase()
 		if(m.author.id != interaction.user.id) return false
 		if(m.content.length != 5) return false
 		if(!wordle.words.includes(m.content) && !wordle.valid.includes(m.content)) {
@@ -125,15 +144,18 @@ async function collect(interaction, word, interact) {
 		return true
 	}
 	const guesses = []
-	const collector = await interaction.channel.createMessageCollector({ filter, time: 20*60000, max: 6 })
+	const collector = await interaction.channel.createMessageCollector({ filter, time: 10*60000, max: 6 })
 	
 	collector.on('collect', async m => {
+		m.content = m.content.toLowerCase()
 		guesses.push(makeArray(m.content, word))
 		let embed;
 		if(m.content == word) {
+			state = true
 			embed = createEmbed(true)
 			collector.stop()
 		}else if(collector.collected.size >= 6) {
+			state = false
 			embed = createEmbed(false, word)
 			collector.stop()
 		}else{
@@ -147,8 +169,38 @@ async function collect(interaction, word, interact) {
 		collector.resetTimer()
 	})
 	
-	collector.on('end', () => {
+	collector.on('end', async collected => {
 		interaction.client.wordle.set(interaction.user.id,false)
+		const users = await db.get('wordle')
+		if(state === true) {
+			users[interaction.user.id].incomplete--
+			users[interaction.user.id].wins++
+			switch (collected.size) {
+				case 1:
+					users[interaction.user.id].one++
+					break;
+				case 2:
+					users[interaction.user.id].two++
+					break;
+				case 3:
+					users[interaction.user.id].three++
+					break;
+				case 4:
+					users[interaction.user.id].four++
+					break;
+				case 5:
+					users[interaction.user.id].five++
+					break;
+				case 6:
+					users[interaction.user.id].six++
+					break;
+				default: console.log(collected.size)
+			}
+		}else if(state === false) {
+			users[interaction.user.id].incomplete--
+			users[interaction.user.id].lost++
+		}
+		db.set('wordle',users)
 	})
 }
 
@@ -182,6 +234,14 @@ module.exports = {
 		const embed = createEmbed()
 		let interact = await interaction.followUp({ embeds: [embed], files: [attachment], fetchReply: true })
 		const word = wordle.words[Math.floor(Math.random()*wordle.words.length)]
+		const users = await db.get('wordle')
+		if(!users[interaction.user.id]) {
+			users[interaction.user.id] = new Wordle(1,1,0,0,0,0,0,0,0)
+		}else{
+			users[interaction.user.id].number++
+			users[interaction.user.id].incomplete++
+		}
+		db.set('wordle',users)
 		interaction.client.wordle.set(interaction.user.id, true)
 		collect(interaction, word, interact)
 	},
