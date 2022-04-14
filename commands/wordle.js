@@ -125,7 +125,7 @@ function keyboardCanvas(guesses) {
 	return canvas
 }
 
-async function collect(interaction, word, interact) {
+async function collect(interaction, word) {
 	let state;
 	const filter = m => {
 		m.content = m.content.toLowerCase()
@@ -135,7 +135,9 @@ async function collect(interaction, word, interact) {
 			(async () => {
 				const reply = await m.reply('Not a valid word')
 				setTimeout(() => {
-					m.delete()
+					if(m.channel.type != 'DM') {
+						m.delete()
+					}
 					reply.delete()
 				}, 5000)
 			})()
@@ -144,7 +146,13 @@ async function collect(interaction, word, interact) {
 		return true
 	}
 	const guesses = []
-	const collector = await interaction.channel.createMessageCollector({ filter, time: 10*60000, max: 6 })
+	let channel = interaction.channel
+	if(!channel) channel = await interaction.client.users.cache.get(interaction.user.id).createDM()
+	const collector = await channel.createMessageCollector({ filter, time: 10*60000, max: 6 })
+	const initialCanvas = createCanvas([])
+	const initialAttachment = new MessageAttachment(initialCanvas.toBuffer(), "wordle.png")
+	const initialEmbed = createEmbed()
+	let interact = await interaction.followUp({ embeds: [initialEmbed], files: [initialAttachment], fetchReply: true })
 	
 	collector.on('collect', async m => {
 		m.content = m.content.toLowerCase()
@@ -165,7 +173,9 @@ async function collect(interaction, word, interact) {
 		const attachment = new MessageAttachment(canvas.toBuffer(), 'wordle.png')
 		await interact.removeAttachments()
 		interact = await interaction.editReply({ embeds: [embed], files: [attachment], fetchReply: true })
-		m.delete()
+		if(m.channel.type != 'DM') {
+			m.delete()
+		}
 		collector.resetTimer()
 	})
 	
@@ -173,7 +183,6 @@ async function collect(interaction, word, interact) {
 		interaction.client.wordle.set(interaction.user.id,false)
 		const users = await db.get('wordle')
 		if(state === true) {
-			users[interaction.user.id].incomplete--
 			users[interaction.user.id].wins++
 			switch (collected.size) {
 				case 1:
@@ -197,9 +206,9 @@ async function collect(interaction, word, interact) {
 				default: console.log(collected.size)
 			}
 		}else if(state === false) {
-			users[interaction.user.id].incomplete--
 			users[interaction.user.id].lost++
 		}
+		users[interaction.user.id].incomplete--
 		db.set('wordle',users)
 	})
 }
@@ -228,11 +237,7 @@ module.exports = {
 		.setDescription('Play wordle!'),
 	async execute(interaction) {
 		if(interaction.client.wordle.get(interaction.user.id)) return interaction.reply({ content: 'You are already playing a Wordle. Please finish it first', ephemeral: true })
-		interaction.deferReply()
-		const canvas = createCanvas([])
-		const attachment = new MessageAttachment(canvas.toBuffer(), "wordle.png")
-		const embed = createEmbed()
-		let interact = await interaction.followUp({ embeds: [embed], files: [attachment], fetchReply: true })
+		await interaction.deferReply()
 		const word = wordle.words[Math.floor(Math.random()*wordle.words.length)]
 		const users = await db.get('wordle')
 		if(!users[interaction.user.id]) {
@@ -243,6 +248,6 @@ module.exports = {
 		}
 		db.set('wordle',users)
 		interaction.client.wordle.set(interaction.user.id, true)
-		collect(interaction, word, interact)
+		collect(interaction, word)
 	},
 };

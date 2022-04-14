@@ -6,7 +6,7 @@ const Database = require("@replit/database")
 const db = new Database()
 const keepAlive = require('./server')
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES ] });
+const client = new Client({ intents: new Intents(37635) });
 
 //Commands Handler
 
