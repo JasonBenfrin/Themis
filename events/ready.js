@@ -22,5 +22,7 @@ module.exports = {
 		index.client.spamDetect = new Map()
 		index.client.leaderBoard = await sort()
 		index.client.wordle = new Map()
+		index.client.user.setActivity('/help', {type: 'PLAYING'})
+		console.log(`Logged in with ${index.client.user.tag} on ${index.client.guilds.cache.size} servers`)
   }
 }

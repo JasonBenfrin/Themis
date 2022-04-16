@@ -1,8 +1,10 @@
+const { execute: ping } = require('../commands/help.js')
+
 module.exports = {
   name: "interactionCreate",
   async execute(interaction){
     const index = require('../index')
-
+		
     if(interaction.isCommand()) {
       const command = index.client.commands.get(interaction.commandName);
 

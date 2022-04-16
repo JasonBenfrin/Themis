@@ -130,7 +130,15 @@ async function collect(interaction, word) {
 	const filter = m => {
 		m.content = m.content.toLowerCase()
 		if(m.author.id != interaction.user.id) return false
-		if(m.content.length != 5) return false
+		if(m.content.length != 5) {
+			(async () => {
+				const reply = await m.reply('Not a 5 letter word')
+				setTimeout(() => {
+					reply.delete()
+				}, 5000)
+			})()
+			return false
+		}
 		if(!wordle.words.includes(m.content) && !wordle.valid.includes(m.content)) {
 			(async () => {
 				const reply = await m.reply('Not a valid word')
@@ -148,7 +156,7 @@ async function collect(interaction, word) {
 	const guesses = []
 	let channel = interaction.channel
 	if(!channel) channel = await interaction.client.users.cache.get(interaction.user.id).createDM()
-	const collector = await channel.createMessageCollector({ filter, time: 10*60000, max: 6 })
+	const collector = await channel.createMessageCollector({ filter, time: 60000, max: 6 })
 	const initialCanvas = createCanvas([])
 	const initialAttachment = new MessageAttachment(initialCanvas.toBuffer(), "wordle.png")
 	const initialEmbed = createEmbed()
@@ -179,7 +187,7 @@ async function collect(interaction, word) {
 		collector.resetTimer()
 	})
 	
-	collector.on('end', async collected => {
+	collector.on('end', async (collected, reason) => {
 		interaction.client.wordle.set(interaction.user.id,false)
 		const users = await db.get('wordle')
 		if(state === true) {
@@ -209,7 +217,13 @@ async function collect(interaction, word) {
 			users[interaction.user.id].lost++
 		}
 		users[interaction.user.id].incomplete--
-		db.set('wordle',users)
+		db.set('wordle', users)
+		if(reason == 'time') {
+			interact.embeds[0].title = 'Timeout!'
+			interact.embeds[0].description = `The correct word was ${word}`
+			const m = await interaction.editReply({ embeds: interact.embeds, files: interact.attachments })
+			m.removeAttachments()
+		}
 	})
 }
 

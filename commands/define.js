@@ -68,11 +68,11 @@ function createButton(offset, length) {
 		.addComponents(
 			new MessageButton()
 	      .setCustomId('back')
-	      .setLabel('◀')
+	      .setEmoji('◀')
 	      .setStyle('PRIMARY'),
 	    new MessageButton()
 	      .setCustomId('front')
-	      .setLabel('▶')
+	      .setEmoji('▶')
 	      .setStyle('PRIMARY')
 		)
 	if(offset == 0){
@@ -95,7 +95,7 @@ async function sendDefine(list, interaction) {
 	const embed = createEmbed(bundle.word, bundle.permalink, bundle.definition, bundle.thumbs_up, bundle.thumbs_down, bundle.example, bundle.written_on, bundle.author)
 	if(list.length == 1) return interaction.followUp({embeds: [embed]})
 	const row = createButton(0, list.length)
-	const interact = await interaction.followUp({ embeds: [embed], components: [row], fetchReply: true })
+	let interact = await interaction.followUp({ embeds: [embed], components: [row], fetchReply: true })
 	collect(interaction, interact, list, 0)
 }
 
@@ -113,23 +113,32 @@ async function collect(interaction, interact, list, offset) {
 			return false
 		}
 	}
-	const collected = await interact.awaitMessageComponent({ filter, time: 1200000, componentType: 'BUTTON', max: 1 })
-	if(collected.customId == 'back') {
-		offset--
-	}else{
-		offset++
-	}
-	const bundle = list[offset]
-	const embed = createEmbed(bundle.word, bundle.permalink, bundle.definition, bundle.thumbs_up, bundle.thumbs_down, bundle.example, bundle.written_on, bundle.author)
-	const buttons = createButton(offset, list.length)
-	const interact2 = await interaction.editReply({embeds: [embed], components: [buttons], fetchReply: true})
-	collect(interaction, interact2, list, offset)
+	const collector = interact.createMessageComponentCollector({filter, time: 600000, componentType: 'BUTTON'})
+	collector.on('collect', async i => {
+		if(i.customId == 'back') {
+			offset--
+		}else{
+			offset++
+		}
+		const bundle = list[offset]
+		const embed = createEmbed(bundle.word, bundle.permalink, bundle.definition, bundle.thumbs_up, bundle.thumbs_down, bundle.example, bundle.written_on, bundle.author)
+		const buttons = createButton(offset, list.length)
+		interact = await interaction.editReply({embeds: [embed], components: [buttons], fetchReply: true})
+		collector.resetTimer()
+	})
+	
+	collector.on('end', () => {
+		interact.components[0].components.forEach(button => {
+			button.disabled = true
+		})
+		interaction.editReply({ embeds: interact.embeds, components: interact.components})
+	})
 }
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('define')
-		.setDescription('Defines a word')
+		.setDescription('Defines a word. (Urban dictionary)')
 		.addStringOption(option => {
 			return option
 				.setName('word')

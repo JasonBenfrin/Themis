@@ -7,7 +7,7 @@ module.exports = help = new MessageEmbed()
   .setDescription('Available Encourage Help Commands')
   .addFields(
     {name:'/encourage add `message`',value:'Adds an encouraging message to be sent'},
-    {name:'/encourage del `index`',value:'Deletes a message at the given index \n (*Please make sure that you check *`/encourage list`* first to make sure that you are deleting the correct message*)'},
+    {name:'/encourage del `index`',value:'Deletes a message at the given index \n (*Please make sure that you check* `/encourage list` *first to make sure that you are deleting the correct message*)'},
     {name:'/encourage help',value:'Shows this message'},
     {name:'/encourage list',value:'Shows a list of messages gathered'}
   )

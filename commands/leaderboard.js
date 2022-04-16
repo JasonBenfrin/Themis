@@ -7,11 +7,11 @@ function createButton(offset, length) {
 		.addComponents(
 			new MessageButton()
 	      .setCustomId('back')
-	      .setLabel('◀')
+	      .setEmoji('◀')
 	      .setStyle('PRIMARY'),
 	    new MessageButton()
 	      .setCustomId('front')
-	      .setLabel('▶')
+	      .setEmoji('▶')
 	      .setStyle('PRIMARY')
 		)
 	if(offset == 0){
@@ -54,7 +54,7 @@ module.exports = {
 		}
 		const embed = createEmbed(leaderboard.slice(0,5),0,interaction.guild.name)
 		const buttons = createButton(0, leaderboard.length)
-		const interact = await interaction.reply({embeds: [embed], components: [buttons], fetchReply: true})
+		let interact = await interaction.reply({embeds: [embed], components: [buttons], fetchReply: true})
 		let offset = 0;
 		collect(interaction, interact, leaderboard, offset)
 	}
@@ -74,14 +74,24 @@ async function collect(interaction, interact, leaderboard, offset) {
 			return false
 		}
 	}
-	const collected = await interact.awaitMessageComponent({ filter, time: 1200000, componentType: 'BUTTON', max: 1 })
-	if(collected.customId == 'back') {
-		offset -= 5;
-	}else{
-		offset += 5;
-	}
-	const embed = createEmbed(leaderboard.slice(offset,offset+5), offset)
-	const buttons = createButton(offset, leaderboard.length)
-	const interact2 = await interaction.editReply({embeds: [embed], components: [buttons], fetchReply: true})
-	collect(interaction, interact2, leaderboard, offset)
+
+	const collector = interact.createMessageComponentCollector({ filter, time: 600000, componentType: 'BUTTON' })
+	
+	collector.on('collect', async i => {
+		if(i.customId == 'back') {
+			offset -= 5
+		}else{
+			offset += 5
+		}
+		const embed = createEmbed(leaderboard.slice(offset, offset+5), offset)
+		const buttons = createButton(offset, leaderboard.length)
+		interact = await interaction.editReply({ embeds: [embed], components: [buttons], fetchReply: true })
+	})
+	
+	collector.on('end', () => {
+		interact.components[0].components.forEach(button => {
+			button.disabled = true
+		})
+		interaction.editReply({ embeds: interact.embeds, components: interact.components })
+	})
 }

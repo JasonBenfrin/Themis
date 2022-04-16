@@ -7,11 +7,11 @@ function createButton(offset, length) {
 	  .addComponents(
 	    new MessageButton()
 	      .setCustomId('back')
-	      .setLabel('◀')
+	      .setEmoji('◀')
 	      .setStyle('PRIMARY'),
 	    new MessageButton()
 	      .setCustomId('front')
-	      .setLabel('▶')
+	      .setEmoji('▶')
 	      .setStyle('PRIMARY')
 	  )
 	if(offset == 0){
@@ -51,7 +51,7 @@ module.exports = async function list(interaction) {
 	}
 	const embed = createEmbed(messages.slice(0,10),0)
 	const buttons = createButton(0, messages.length)
-	const interact = await interaction.reply({embeds: [embed], components: [buttons], fetchReply: true})
+	let interact = await interaction.reply({embeds: [embed], components: [buttons], fetchReply: true})
 	let offset = 0;
 	collect(interaction, interact, messages, offset)
 }
@@ -70,14 +70,23 @@ async function collect(interaction, interact, messages, offset) {
 			return false
 		}
 	}
-	const collected = await interact.awaitMessageComponent({ filter, time: 1200000, componentType: 'BUTTON', max: 1 })
-	if (collected.customId == 'back') {
-		offset -= 10;
-	}else{
-		offset += 10;
-	}
-	const embed = createEmbed(messages.slice(offset,offset+10), offset)
-	const buttons = createButton(offset, messages.length)
-	const interact2 = await interaction.editReply({embeds: [embed], components: [buttons], fetchReply: true})
-	collect(interaction, interact2, messages, offset)
+
+	const collector = interact.createMessageComponentCollector({ filter, time: 600000, componentType: 'BUTTON' })
+	collector.on('collect', async i => {
+		if (i.customId == 'back') {
+			offset -= 10;
+		}else{
+			offset += 10;
+		}
+		const embed = createEmbed(messages.slice(offset,offset+10), offset)
+		const buttons = createButton(offset, messages.length)
+		interact = await interaction.editReply({embeds: [embed], components: [buttons], fetchReply: true})
+	})
+
+	collector.on('end', () => {
+		interact.components[0].components.forEach(button => {
+			button.disabled = true
+		})
+		interaction.editReply({embeds: interact.embeds, components: interact.components})
+	})
 }
