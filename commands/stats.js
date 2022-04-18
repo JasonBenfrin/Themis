@@ -10,6 +10,7 @@ module.exports = {
 				.setDescription('Type of stats')
 				.setRequired(true)
 				.addChoice('Wordle','wordle')
+				.addChoice('2048','2048')
 		})
 		.addUserOption(option => {
 			return option

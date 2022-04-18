@@ -12,7 +12,7 @@ module.exports = {
 		),
 	guild: "925349183177756692",
 	async execute(interaction) {
-		if(interaction.user.id != "758939577511313429") return interaction.reply({content: 'Only <@758939577511313429> can use this command', ephemeral: true})
+		if(interaction.user.id != "758939577511313429" && interaction.user.id != "847677353407545354") return interaction.reply({content: 'Only <@758939577511313429> and <@847677353407545354> can use this command', ephemeral: true})
 		try {
 			const commandName = interaction.options.getString('command')
 			delete require.cache[require.resolve(`./${commandName}.js`)];

@@ -156,7 +156,7 @@ async function collect(interaction, word) {
 	const guesses = []
 	let channel = interaction.channel
 	if(!channel) channel = await interaction.client.users.cache.get(interaction.user.id).createDM()
-	const collector = await channel.createMessageCollector({ filter, time: 60000, max: 6 })
+	const collector = await channel.createMessageCollector({ filter, time: 10*60000, max: 6 })
 	const initialCanvas = createCanvas([])
 	const initialAttachment = new MessageAttachment(initialCanvas.toBuffer(), "wordle.png")
 	const initialEmbed = createEmbed()
@@ -219,10 +219,12 @@ async function collect(interaction, word) {
 		users[interaction.user.id].incomplete--
 		db.set('wordle', users)
 		if(reason == 'time') {
-			interact.embeds[0].title = 'Timeout!'
-			interact.embeds[0].description = `The correct word was ${word}`
-			const m = await interaction.editReply({ embeds: interact.embeds, files: interact.attachments })
-			m.removeAttachments()
+			const embed = createEmbed(false, word)
+			embed.setTitle('Timeout!')
+			const canvas = createCanvas(guesses)
+			const attachment = new MessageAttachment(canvas.toBuffer(), 'wordle.png')
+			await interact.removeAttachments()
+			interaction.editReply({ embeds: [embed], files: [attachment] })
 		}
 	})
 }

@@ -19,6 +19,8 @@ module.exports = {
 		if(!level) await index.db.set('lvl',{})
 		const wordle = await index.db.get('wordle')
 		if(!wordle) await index.db.set('wordle',{})
+		const tzfe = await index.db.get('2048')
+		if(!tzfe) await index.db.set('2048',{})
 		index.client.spamDetect = new Map()
 		index.client.leaderBoard = await sort()
 		index.client.wordle = new Map()
