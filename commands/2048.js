@@ -63,7 +63,7 @@ module.exports = {
 		await db.set('2048',users)
 		
 		let triggered = false
-		await interaction.deferReply()
+		await interaction.reply('Loading...')
 		await interaction.deleteReply()
 		let array = []
 		let score = 0

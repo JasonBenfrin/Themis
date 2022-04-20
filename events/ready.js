@@ -21,6 +21,8 @@ module.exports = {
 		if(!wordle) await index.db.set('wordle',{})
 		const tzfe = await index.db.get('2048')
 		if(!tzfe) await index.db.set('2048',{})
+		const rps = await index.db.get('rps')
+		if(!rps) await index.db.set('rps',{})
 		index.client.spamDetect = new Map()
 		index.client.leaderBoard = await sort()
 		index.client.wordle = new Map()

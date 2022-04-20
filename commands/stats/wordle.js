@@ -26,8 +26,8 @@ module.exports = {
 				{ name: 'Five', value: member.five.toString(), inline: true },
 				{ name: 'Six', value: member.six.toString(), inline: true }
 			])
-		.setTimestamp()
-  	.setFooter(`Bot Version: Release ${process.env.version}`, 'https://i.imgur.com/l3vDws1.png')
-	return interaction.reply({ embeds: [embed] })
+			.setTimestamp()
+	  	.setFooter(`Bot Version: Release ${process.env.version}`, 'https://i.imgur.com/l3vDws1.png')
+		return interaction.reply({ embeds: [embed] })
 	}
 }

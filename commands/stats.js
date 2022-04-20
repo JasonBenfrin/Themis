@@ -8,9 +8,12 @@ module.exports = {
 			return option
 				.setName('type')
 				.setDescription('Type of stats')
+				.addChoices(
+					{name: 'Wordle', value: 'wordle'},
+					{name: '2048', value: '2048'},
+					{name: 'Rock Paper Scissors', value: 'rps'}
+				)
 				.setRequired(true)
-				.addChoice('Wordle','wordle')
-				.addChoice('2048','2048')
 		})
 		.addUserOption(option => {
 			return option
