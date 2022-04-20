@@ -262,7 +262,11 @@ async function collect(interact, p1, p2, rounds) {
 				user1.draws++
 				user2.draws++
 			}
-		}else interact.embeds[0].description = 'Timeout!'
+		}else {
+			interact.embeds[0].description = 'Timeout!'
+			user1.incomplete++
+			user2.incomplete++
+		}
 		user1.incomplete--
 		user2.incomplete--
 		await db.set('rps',users)
