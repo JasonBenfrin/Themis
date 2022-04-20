@@ -293,7 +293,7 @@ module.exports = {
 	async execute(interaction) {
 		if(interaction.channel.type != 'GUILD_TEXT') return interaction.reply('Sorry. This command is only available in servers.')
 		if(interaction.options.getUser('user') && interaction.options.getUser('user').bot && interaction.options.getUser('user').id != interaction.client.user.id) return interaction.reply('How are you going to play with a bot?')
-		if(!interaction.guild.members.cache.get(interaction.options.getUser('user').id)) return interaction.reply('The user is not in this server!')
+		if(interaction.options.getUser('user') && !interaction.guild.members.cache.get(interaction.options.getUser('user').id)) return interaction.reply('The user is not in this server!')
 		const rounds = interaction.options.getInteger('rounds') || 3
 		const opponent = interaction.options.getUser('user') || interaction.client.user
 		const p1 = new Player(interaction.user, 0, null)
