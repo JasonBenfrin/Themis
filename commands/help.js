@@ -5,7 +5,7 @@ const help = new MessageEmbed()
   .setColor('#a4cfef')
   .setTitle('Help')
   .setAuthor('Encourage Bot', 'https://i.imgur.com/l3vDws1.png')
-  .setDescription('Available Help Commands')
+  .setDescription('Available Commands')
   .addFields(
 		{name:'/2048', value:'Play 2048.', inline: true},
 		{name:'/bot-info', value:'Sends a link to bot\'s code', inline: true},

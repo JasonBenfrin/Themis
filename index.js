@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
-const token = process.env['token']
+const token = process.env.token
 const updateCommands = require('./deploy-commands')
 const Database = require("@replit/database")
 const db = new Database()
@@ -10,7 +10,7 @@ const client = new Client({ intents: new Intents(37635) });
 
 //Commands Handler
 
-client.commands = new Collection();
+client.commands = new Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {

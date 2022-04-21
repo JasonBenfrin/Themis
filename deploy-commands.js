@@ -1,25 +1,22 @@
-const fs = require('fs');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const token = process.env['token']
-const clientId = process.env['clientId']
+const token = process.env.token
+const clientId = process.env.clientId
 
-const updateCommands = function (){
+function updateCommands(client) {
   const commands = [];
 	const privateCommands = [];
 	let guildId;
-  const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-  for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
-    if(!command.guild) {
+	client.commands.forEach(command => {
+		if(!command.guild){
 			commands.push(command.data.toJSON())
 		}else{
 			privateCommands.push(command.data.toJSON())
 			guildId = command.guild
 		}
-  }
-
+	})
+	
   const rest = new REST({ version: '9' }).setToken(token);
 
   rest.put(Routes.applicationCommands(clientId), { body: commands })
@@ -31,4 +28,4 @@ const updateCommands = function (){
     .catch(console.error);
 }
 
-module.exports = updateCommands;
+module.exports = { updateCommands };
