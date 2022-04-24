@@ -5,7 +5,20 @@ function page1Rows() {
 	const row = new MessageActionRow()
 		.addComponents([
 			new MessageButton()
-				.setCustomId('')
+				.setCustomId('pg2')
+				.setLabel('2nd')
+				.setStyle('PRIMARY'),
+			new MessageButton()
+				.setCustomId('pi')
+				.setLabel('π')
+				.setStyle('SECONDARY'),
+			new MessageButton()
+				.setCustomId('e')
+				.setLabel('e')
+				.setLabel('SECONDARY'),
+			new MessageButton()
+				.setCustomId('clear')
+				.setLabel('C')
 		])
 }
 

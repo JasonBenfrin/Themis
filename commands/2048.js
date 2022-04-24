@@ -63,8 +63,7 @@ module.exports = {
 		await db.set('2048',users)
 		
 		let triggered = false
-		await interaction.reply('Loading...')
-		await interaction.deleteReply()
+		await interaction.deferReply()
 		let array = []
 		let score = 0
 		let previous;
@@ -318,7 +317,7 @@ module.exports = {
 		
 		const canvas = createCanvas()
 		const attachment = new MessageAttachment(canvas.toBuffer(), '2048.png')
-		let interact = await interaction.channel.send({embeds: [createEmbed()], components: [createButton()], files: [attachment], fetchReply: true})
+		let interact = await interaction.followUp({embeds: [createEmbed()], components: [createButton()], files: [attachment], fetchReply: true})
 
 		const filter = i => {
 			i.deferUpdate()
