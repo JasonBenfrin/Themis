@@ -31,10 +31,10 @@ function createEmbed(msgToTen, offset) {
 	const embed = new MessageEmbed()
 		.setColor('#9f7fbc')
 		.setTitle('Encourage List')
-		.setAuthor('Encourage Bot', 'https://i.imgur.com/l3vDws1.png')
+		.setAuthor({name: 'Encourage Bot', iconURL: 'https://i.imgur.com/l3vDws1.png'})
 		.setDescription('List of encouraging messages')
 		.setTimestamp()
-		.setFooter(`Bot Version: Release ${process.env.version}`, 'https://i.imgur.com/l3vDws1.png')
+		.setFooter({text: `Bot Version: Release ${process.env.version}`, iconURL: 'https://i.imgur.com/l3vDws1.png'})
 	msgToTen.forEach(msg => {
 		if(msg.length >= 256) msg = msg.substring(0,253)+'...'
 		embed.addField(`${offset}.  ${msg}`,'\u200B')

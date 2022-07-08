@@ -80,7 +80,7 @@ function createRow(p1name, p2name, p1disabled, p2disabled, bot) {
 
 function createEmbed(p1, p2, round, state) {
 	const embed = new MessageEmbed()
-		.setAuthor(p1.user.username+' is challenging '+p2.user.username, p1.user.displayAvatarURL())
+		.setAuthor({name: p1.user.username+' is challenging '+p2.user.username,iconURL: p1.user.displayAvatarURL()})
 		.setThumbnail(p2.user.displayAvatarURL())
 		.setTitle(`Round ${round}`)
 		.setColor('#6dedc0')
@@ -291,7 +291,7 @@ module.exports = {
 				.setMaxValue(10)
 		}),
 	async execute(interaction) {
-		if(interaction.channel.type != 'GUILD_TEXT') return interaction.reply('Sorry. This command is only available in servers.')
+		if(!interaction.channel || interaction.channel.type != 'GUILD_TEXT') return interaction.reply('Sorry. This command is only available in servers.')
 		if(interaction.options.getUser('user') && interaction.options.getUser('user').bot && interaction.options.getUser('user').id != interaction.client.user.id) return interaction.reply('How are you going to play with a bot?')
 		if(interaction.options.getUser('user') && !interaction.guild.members.cache.get(interaction.options.getUser('user').id)) return interaction.reply('The user is not in this server!')
 		const rounds = interaction.options.getInteger('rounds') || 3

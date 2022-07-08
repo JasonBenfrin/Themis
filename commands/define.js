@@ -59,7 +59,7 @@ function createEmbed(word, url, def, likes, dislikes, example, time, author) {
 			{name: '\u200B', value: `👎: ${dislikes}`, inline: true}
 		])
 		.setTimestamp(time)
-		.setAuthor(author, '', `https://www.urbandictionary.com/author.php?author=${encodeURI(author)}`)
+		.setAuthor({name: author, url: `https://www.urbandictionary.com/author.php?author=${encodeURI(author)}`})
 	return embed
 }
 
@@ -146,7 +146,7 @@ module.exports = {
 				.setRequired(true)
 		}),
 	async execute(interaction) {
-		interaction.deferReply()
+		await interaction.deferReply()
 		urban(interaction, sendDefine)
 	}
 }

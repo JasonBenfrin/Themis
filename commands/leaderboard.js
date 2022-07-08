@@ -33,7 +33,7 @@ function createEmbed(users, offset, name) {
 			.setTitle('Leaderboard')
 			.setDescription(`Leaderboard for ${name}`)
 			.setTimestamp()
-			.setFooter(`Bot Version: Release ${process.env.version}`, 'https://i.imgur.com/l3vDws1.png')
+			.setFooter({text: `Bot Version: Release ${process.env.version}`, iconURL: 'https://i.imgur.com/l3vDws1.png'})
 	users.forEach(user => {
 		const thisUser = Object.values(user)[0]
 		embed.addField(`${offset+1}. ${thisUser.name}`,`Level: **${thisUser.level}**`)
@@ -83,7 +83,7 @@ async function collect(interaction, interact, leaderboard, offset) {
 		}else{
 			offset += 5
 		}
-		const embed = createEmbed(leaderboard.slice(offset, offset+5), offset)
+		const embed = createEmbed(leaderboard.slice(offset, offset+5), offset,interaction.guild.name)
 		const buttons = createButton(offset, leaderboard.length)
 		interact = await interaction.editReply({ embeds: [embed], components: [buttons], fetchReply: true })
 	})

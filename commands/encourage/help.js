@@ -3,7 +3,7 @@ const { MessageEmbed } = require('discord.js');
 module.exports = help = new MessageEmbed()
   .setColor('#EB7556')
   .setTitle('Encourage Help')
-  .setAuthor('Encourage Bot', 'https://i.imgur.com/l3vDws1.png')
+  .setAuthor({name: 'Encourage Bot', iconURL: 'https://i.imgur.com/l3vDws1.png'})
   .setDescription('Available Encourage Help Commands')
   .addFields(
     {name:'/encourage add `message`',value:'Adds an encouraging message to be sent'},
@@ -12,4 +12,4 @@ module.exports = help = new MessageEmbed()
     {name:'/encourage list',value:'Shows a list of messages gathered'}
   )
   .setTimestamp()
-  .setFooter(`Bot Version: Release ${process.env.version}`, 'https://i.imgur.com/l3vDws1.png')
+  .setFooter({text: `Bot Version: Release ${process.env.version}`, iconURL: 'https://i.imgur.com/l3vDws1.png'})

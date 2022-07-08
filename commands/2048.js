@@ -303,8 +303,8 @@ module.exports = {
 				.setDescription(`Score: ${score}`)
 				.setColor('#ffd342')
 				.setImage('attachment://2048.png')
-				.setFooter('Get a tile to 2048!')
-				.setAuthor(`${interaction.user.username}'s game`, interaction.user.displayAvatarURL())
+				.setFooter({text: 'Get a tile to 2048!'})
+				.setAuthor({name: `${interaction.user.username}'s game`, iconURL: interaction.user.displayAvatarURL()})
 			return embed
 		}
 
@@ -364,7 +364,7 @@ module.exports = {
 			}
 			if(win()) {
 				embed.setTitle('2048!')
-				embed.setFooter('Continue if you love to do so.')
+				embed.setFooter({text: 'Continue if you love to do so.'})
 				if(!triggered) {
 					const user = await db.get('2048')
 					user[interaction.user.id].wins++

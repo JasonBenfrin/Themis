@@ -4,7 +4,7 @@ const { MessageEmbed } = require('discord.js')
 const help = new MessageEmbed()
   .setColor('#a4cfef')
   .setTitle('Help')
-  .setAuthor('Encourage Bot', 'https://i.imgur.com/l3vDws1.png')
+  .setAuthor({name: 'Encourage Bot', iconURL: 'https://i.imgur.com/l3vDws1.png'})
   .setDescription('Available Commands')
   .addFields(
 		{name:'/2048', value:'Play 2048.', inline: true},
@@ -22,7 +22,7 @@ const help = new MessageEmbed()
     {name:"/wordle", value:"Play wordle!", inline: true}
   )
   .setTimestamp()
-  .setFooter(`Bot Version: Release ${process.env.version}`, 'https://i.imgur.com/l3vDws1.png');
+  .setFooter({text: `Bot Version: Release ${process.env.version}`,iconURL: 'https://i.imgur.com/l3vDws1.png'});
 
 module.exports = {
 	data: new SlashCommandBuilder()

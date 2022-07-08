@@ -10,7 +10,7 @@ module.exports = {
 		if(!member) return interaction.reply('Wow! This user hasn\'t played a single 2048!')
 		const embed = new MessageEmbed()
 			.setTitle(`2048 stats for ${user.tag}`)
-			.setAuthor(user.username, user.displayAvatarURL())
+			.setAuthor({name: user.username,iconURL: user.displayAvatarURL()})
 			.setColor(user.hexAccentColor)
 			.addFields([
 				{name: '2048s played', value: member.number.toString(), inline: true},
@@ -21,7 +21,7 @@ module.exports = {
 				{name: 'Highscore', value: member.highscore.toString(), inline: false},
 			])
 			.setTimestamp()
-  		.setFooter(`Bot Version: Release ${process.env.version}`, 'https://i.imgur.com/l3vDws1.png')
+  		.setFooter({text: `Bot Version: Release ${process.env.version}`, iconURL: 'https://i.imgur.com/l3vDws1.png'})
 		return interaction.reply({ embeds: [embed] })
 	}
 }

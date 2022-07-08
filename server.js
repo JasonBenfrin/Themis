@@ -2,7 +2,7 @@ const express = require("express")
 const server = express()
 
 server.all("/",(req,res)=>{
-  res.send("I'm alive")
+  res.redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 } );
 
 function keepAlive(){

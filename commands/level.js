@@ -86,11 +86,8 @@ module.exports = {
 
 		context.moveTo(offset + offsetRound, offset)
 		context.arcTo(offset, offset, offset, offset + offsetRound, radius)
-		context.lineTo(offset, canvas.height - offset - offsetRound)
 		context.arcTo(offset, canvas.height - offset, offset + offsetRound, canvas.height - offset, radius)
-		context.lineTo(canvas.width - offset - offsetRound, canvas.height - offset)
 		context.arcTo(canvas.width - offset, canvas.height - offset, canvas.width - offset, canvas.height - offset - offsetRound, radius)
-		context.lineTo(canvas.width - offset, offset + offsetRound)
 		context.arcTo(canvas.width - offset, offset, canvas.width - offset - offsetRound, offset, radius)
 		context.closePath()
 		context.clip()
@@ -175,7 +172,6 @@ module.exports = {
 				let levelLength = (canvas.width - offset - 50 - (canvas.width / 4 + 20))*levelExp/nextLevelExp
 				levelLength += canvas.width / 4 + 20
 				if(levelLength < canvas.width / 4 + 20) levelLength = canvas.width / 4 + 20
-				context.lineTo(levelLength, canvas.height / 1.8 + 30)
 				context.arc(levelLength, canvas.height / 1.8 + 50, 20, 3*Math.PI/2, Math.PI/2)
 				context.closePath()
 				context.fillStyle = "#82b2d6"

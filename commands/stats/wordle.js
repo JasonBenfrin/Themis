@@ -10,7 +10,7 @@ module.exports = {
 		if(!member) return interaction.reply('Wow! This user hasn\'t played a single Wordle!')
 		const embed = new MessageEmbed()
 			.setTitle(`Wordle stats for ${user.tag}`)
-			.setAuthor(user.username, user.displayAvatarURL())
+			.setAuthor({name: user.username,iconURL: user.displayAvatarURL()})
 			.setColor(user.hexAccentColor)
 			.addFields([
 				{ name: 'Wordles played', value: member.number.toString(), inline: true },
@@ -27,7 +27,7 @@ module.exports = {
 				{ name: 'Six', value: member.six.toString(), inline: true }
 			])
 			.setTimestamp()
-	  	.setFooter(`Bot Version: Release ${process.env.version}`, 'https://i.imgur.com/l3vDws1.png')
+	  	.setFooter({text: `Bot Version: Release ${process.env.version}`,iconURL: 'https://i.imgur.com/l3vDws1.png'})
 		return interaction.reply({ embeds: [embed] })
 	}
 }

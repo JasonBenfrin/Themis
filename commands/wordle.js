@@ -41,7 +41,7 @@ function createEmbed(win, word) {
 	const embed = new MessageEmbed()
 		.setColor('#ffffff')
 		.setImage('attachment://wordle.png')
-		.setFooter(`Guess a 5 letter word.\nThe game will end after 10 minutes of inactivity.`)
+		.setFooter({text: `Guess a 5 letter word.\nThe game will end after 10 minutes of inactivity.`})
 	if(win === true) {
 		embed.setTitle('Brilliant!')
 	}else if(win === false){

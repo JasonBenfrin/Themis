@@ -10,7 +10,7 @@ module.exports = {
 		if(!member) return interaction.reply('Wow! This user hasn\'t played a single Rock Paper Scissors!')
 		const embed = new MessageEmbed()
 			.setTitle(`RPS stats for ${user.tag}`)
-			.setAuthor(user.username, user.displayAvatarURL())
+			.setAuthor({name: user.username,iconURL: user.displayAvatarURL()})
 			.setColor(user.hexAccentColor)
 			.addFields([
 				{ name: 'RPSs played', value: member.number.toString(), inline: true },
@@ -21,7 +21,7 @@ module.exports = {
 				{ name: 'Draws', value: member.draws.toString(), inline: true }
 			])
 			.setTimestamp()
-	  	.setFooter(`Bot Version: Release ${process.env.version}`, 'https://i.imgur.com/l3vDws1.png')
+	  	.setFooter({text: `Bot Version: Release ${process.env.version}`, iconURL: 'https://i.imgur.com/l3vDws1.png'})
 		return interaction.reply({ embeds: [embed] })
 	}
 }
