@@ -288,7 +288,7 @@ async function funGame(p1, p2, interact, game, difficulty) {
 		interact.components.forEach(l => l.components.forEach(b => b.disabled = true))
 		const end = gameEnd(game)
 		const embed = [createEmbed(p1, p2, 'p2')]
-		embed[0].description = end ? `${end == 'O' ? p1.name : p2.name} won!` : gameOver ? "DRAW!" : "Time's up!"
+		embed[0].description = end ? `${end == 'O' ? p1.username : p2.username} won!` : gameOver ? "DRAW!" : "Time's up!"
 		interact.edit({components: interact.components, embeds: embed, files: [new MessageAttachment(createCanvas(game).toBuffer(), 'ttt.png')]})
 	})
 }
