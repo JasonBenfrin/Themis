@@ -267,7 +267,7 @@ async function funGame(p1, p2, interact, game, difficulty) {
 			turn = p1.id
 		}
 
-		if(difficulty) {
+		if(difficulty && !gameEnd(game)) {
 			const position = await aiInstance.play(game.flat())
 			const [a, b] = aiToGame(position)
 			game[a][b] = 'X'
