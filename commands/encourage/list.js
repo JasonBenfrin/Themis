@@ -1,18 +1,19 @@
 const Database = require('@replit/database')
 const db = new Database()
-const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle } = require('discord.js');
+const { ComponentType } = require('discord-api-types/v10')
 
 function createButton(offset, length) {
-	const row = new MessageActionRow()
+	const row = new ActionRowBuilder()
 	  .addComponents(
-	    new MessageButton()
+	    new ButtonBuilder()
 	      .setCustomId('back')
 	      .setEmoji('◀')
-	      .setStyle('PRIMARY'),
-	    new MessageButton()
+	      .setStyle(ButtonStyle.Primary),
+	    new ButtonBuilder()
 	      .setCustomId('front')
 	      .setEmoji('▶')
-	      .setStyle('PRIMARY')
+	      .setStyle(ButtonStyle.Primary)
 	  )
 	if(offset == 0){
 		row.components[0].setDisabled(true)
@@ -28,7 +29,7 @@ function createButton(offset, length) {
 }
 
 function createEmbed(msgToTen, offset) {
-	const embed = new MessageEmbed()
+	const embed = new EmbedBuilder()
 		.setColor('#9f7fbc')
 		.setTitle('Encourage List')
 		.setAuthor({name: 'Encourage Bot', iconURL: 'https://i.imgur.com/l3vDws1.png'})
@@ -37,7 +38,7 @@ function createEmbed(msgToTen, offset) {
 		.setFooter({text: `Bot Version: Release ${process.env.version}`, iconURL: 'https://i.imgur.com/l3vDws1.png'})
 	msgToTen.forEach(msg => {
 		if(msg.length >= 256) msg = msg.substring(0,253)+'...'
-		embed.addField(`${offset}.  ${msg}`,'\u200B')
+		embed.addFields([{name: `${offset}.  ${msg}`, value: '\u200B'}])
 		offset++
 	})
 	return embed
@@ -71,7 +72,7 @@ async function collect(interaction, interact, messages, offset) {
 		}
 	}
 
-	const collector = interact.createMessageComponentCollector({ filter, time: 600000, componentType: 'BUTTON' })
+	const collector = interact.createMessageComponentCollector({ filter, time: 600000, componentType: ComponentType.Button })
 	collector.on('collect', async i => {
 		if (i.customId == 'back') {
 			offset -= 10;

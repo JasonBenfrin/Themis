@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders')
-const { MessageAttachment } = require('discord.js')
+const { AttachmentBuilder, SlashCommandBuilder } = require('discord.js')
 const Canvas = require('canvas')
 const fs = require('fs')
 const path = require('path')
@@ -116,7 +115,7 @@ module.exports = {
 		context.arc(150, 150, 80, 0, 2 * Math.PI)
 		context.closePath()
 		context.clip()
-		const avatar = await Canvas.loadImage(user.displayAvatarURL({size: 600, format: 'jpg'}))
+		const avatar = await Canvas.loadImage(user.displayAvatarURL({size: 512, extension: 'jpg'}))
 		context.drawImage(avatar, 65, 65, 170, 170)
 		context.restore()
 
@@ -190,7 +189,7 @@ module.exports = {
 			}
 		}
 
-		const attachment = new MessageAttachment(canvas.toBuffer(), "level.png")
+		const attachment = new AttachmentBuilder(canvas.toBuffer(), {name: "level.png"})
 		return interaction.followUp({ files: [attachment] });
 	}
 };

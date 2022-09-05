@@ -1,19 +1,20 @@
-const { MessageActionRow, MessageButton } = require('discord.js')
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
+const { ComponentType } = require('discord-api-types/v10')
 const Database = require("@replit/database")
 const db = new Database()
 
 function createButton(disable) {
-	const row = new MessageActionRow()
+	const row = new ActionRowBuilder()
 	  .addComponents(
-	    new MessageButton()
+	    new ButtonBuilder()
 	      .setCustomId('yes')
 	      .setLabel('Confirm')
-	      .setStyle('DANGER')
+	      .setStyle(ButtonStyle.Danger)
 				.setDisabled(disable),
-	    new MessageButton()
+	    new ButtonBuilder()
 	      .setCustomId('no')
 	      .setLabel('Cancel')
-	      .setStyle('SUCCESS')
+	      .setStyle(ButtonStyle.Success)
 				.setDisabled(disable)
   	)
 	return row
@@ -44,7 +45,7 @@ async function del(interaction) {
 			return false
 		}
 	}
-	const collector = interact.createMessageComponentCollector({filter, time: 60000, componentType: 'BUTTON', max: 1 })
+	const collector = interact.createMessageComponentCollector({filter, time: 60000, componentType: ComponentType.Button, max: 1 })
 	collector.on('collect', async i => {
 		if(i.customId == 'yes') {
 			encourage.splice(integer, 1)

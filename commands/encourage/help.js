@@ -1,6 +1,6 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
-module.exports = help = new MessageEmbed()
+module.exports = help = new EmbedBuilder()
   .setColor('#EB7556')
   .setTitle('Encourage Help')
   .setAuthor({name: 'Encourage Bot', iconURL: 'https://i.imgur.com/l3vDws1.png'})

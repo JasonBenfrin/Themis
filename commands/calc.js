@@ -1,121 +1,120 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton } = require('discord.js')
+const { ActionRowBuilder, ButtonBuilder, SlashCommandBuilder, ButtonStyle } = require('discord.js')
 
 function page1Rows() {
-	const row1 = new MessageActionRow()
+	const row1 = new ActionRowBuilder()
 		.addComponents([
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('pg2')
 				.setLabel('2nd')
-				.setStyle('PRIMARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Primary),
+			new ButtonBuilder()
 				.setCustomId('pi')
 				.setLabel('π')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('e')
 				.setLabel('e')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('clear')
 				.setLabel('C')
-				.setStyle('DANGER'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Danger),
+			new ButtonBuilder()
 				.setCustomId('back')
 				.setEmoji('<:backspace:967783370232856586>')
-				.setStyle('DANGER')
+				.setStyle(ButtonStyle.Danger)
 		])
-	const row2 = new MessageActionRow()
+	const row2 = new ActionRowBuilder()
 		.addComponents([
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('square')
 				.setLabel('𝑥²')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('7')
 				.setLabel('7')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('8')
 				.setLabel('8')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('9')
 				.setLabel('9')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('divide')
 				.setLabel('÷')
-				.setStyle('PRIMARY')
+				.setStyle(ButtonStyle.Primary)
 		])
-	const row3 = new MessageActionRow()
+	const row3 = new ActionRowBuilder()
 		.addComponents([
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('sqrt')
 				.setLabel('√𝑥')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('4')
 				.setLabel('4')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('5')
 				.setLabel('5')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('6')
 				.setLabel('6')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('multiply')
 				.setLabel('×')
-				.setStyle('PRIMARY')
+				.setStyle(ButtonStyle.Primary)
 		])
-	const row4 = new MessageActionRow()
+	const row4 = new ActionRowBuilder()
 		.addComponents([
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('log')
 				.setLabel('log')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('1')
 				.setLabel('1')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('2')
 				.setLabel('2')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('3')
 				.setLabel('3')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('minus')
 				.setLabel('-')
-				.setStyle('PRIMARY')
+				.setStyle(ButtonStyle.Primary)
 		])
-	const row5 = new MessageActionRow()
+	const row5 = new ActionRowBuilder()
 		.addComponents([
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('ln')
 				.setLabel('ln')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('.')
 				.setLabel('.')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('0')
 				.setLabel('0')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('calc')
 				.setLabel('=')
 				.setStyle('SUCCESS'),
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('plus')
 				.setLabel('+')
-				.setStyle('PRIMARY')
+				.setStyle(ButtonStyle.Primary)
 		])
 	return [row1, row2, row3, row4, row5]
 }
@@ -123,121 +122,121 @@ function page1Rows() {
 function page2Rows(rod) {
 	let style = ''
 	if(rod == 'Rad') style = 'SUCCESS'
-	else style = 'PRIMARY'
-	const row1 = new MessageActionRow()
+	else style = ButtonStyle.Primary
+	const row1 = new ActionRowBuilder()
 		.addComponents([
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('pg1')
 				.setLabel('2nd')
-				.setStyle('SUCCESS'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Success),
+			new ButtonBuilder()
 				.setCustomId(rod)
 				.setLabel(rod)
 				.setStyle(style),
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('sin')
 				.setLabel('sin')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('cos')
 				.setLabel('cos')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('tan')
 				.setLabel('tan')
-				.setStyle('SECONDARY')
+				.setStyle(ButtonStyle.Secondary)
 		])
-	const row2 = new MessageActionRow()
+	const row2 = new ActionRowBuilder()
 		.addComponents([
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('percent')
 				.setLabel('%')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('fact')
 				.setLabel('𝑥!')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('sini')
 				.setLabel('sin⁻¹')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('cosi')
 				.setLabel('cos⁻¹')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('tani')
 				.setLabel('tan⁻¹')
-				.setStyle('SECONDARY')
+				.setStyle(ButtonStyle.Secondary)
 		])
-	const row3 = new MessageActionRow()
+	const row3 = new ActionRowBuilder()
 		.addComponents([
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('Mod')
 				.setLabel('|𝑥|')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('pow')
 				.setLabel('𝑥ʸ')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('modulo')
 				.setLabel('Rema')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('rand')
 				.setLabel('Rand')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('neg')
 				.setLabel('Neg')
-				.setStyle('SECONDARY')
+				.setStyle(ButtonStyle.Secondary)
 		])
-	const row4 = new MessageActionRow()
+	const row4 = new ActionRowBuilder()
 		.addComponents([
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('lg')
 				.setLabel('lg𝑥')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('root')
 				.setLabel('ʸ√𝑥')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('inv')
 				.setLabel('¹/𝑥')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('bo')
 				.setLabel('(')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('bc')
 				.setLabel(')')
-				.setStyle('SECONDARY')
+				.setStyle(ButtonStyle.Secondary)
 		])
-	const row5 = new MessageActionRow()
+	const row5 = new ActionRowBuilder()
 		.addComponents([
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('exp')
 				.setLabel('eˣ')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('10pow')
 				.setLabel('10ˣ')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('2pow')
 				.setLabel('2ˣ')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('logyx')
 				.setLabel('logᵧˣ')
-				.setStyle('SECONDARY'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
 				.setCustomId('sign')
 				.setLabel('+/-')
-				.setStyle('SECONDARY')
+				.setStyle(ButtonStyle.Secondary)
 		])
 	return [row1, row2, row3, row4, row5]
 }

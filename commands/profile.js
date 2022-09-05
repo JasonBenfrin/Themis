@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } =  require('discord.js')
+const { EmbedBuilder, SlashCommandBuilder } =  require('discord.js')
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -12,7 +11,7 @@ module.exports = {
 		}),
 	async execute(interaction) {
 		const user = interaction.options.getUser('user') || interaction.user
-		const embed = new MessageEmbed()
+		const embed = new EmbedBuilder()
 			.setColor('#e83c56')
 			.setTitle(user.tag)
 			.setDescription(`Default profile picture for ${user.username}`)

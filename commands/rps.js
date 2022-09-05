@@ -1,5 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js')
+const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, SlashCommandBuilder, ButtonStyle } = require('discord.js')
+const { ComponentType } = require('discord-api-types/v10')
 const Database = require('@replit/database')
 const db = new Database()
 
@@ -26,51 +26,51 @@ class Player {
 function createRow(p1name, p2name, p1disabled, p2disabled, bot) {
 	if(!p1disabled) p1disabled = false
 	if(!p2disabled) p2disabled = false
-	const row1 = new MessageActionRow()
+	const row1 = new ActionRowBuilder()
 		.addComponents([
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('p1')
 				.setLabel(p1name)
-				.setStyle('SECONDARY')
+				.setStyle(ButtonStyle.Secondary)
 				.setDisabled(true),
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('p1rock')
 				.setEmoji('✊')
-				.setStyle('PRIMARY')
+				.setStyle(ButtonStyle.Primary)
 				.setDisabled(p1disabled),
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('p1paper')
 				.setEmoji('🖐️')
-				.setStyle('SUCCESS')
+				.setStyle(ButtonStyle.Success)
 				.setDisabled(p1disabled),
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId('p1scissors')
 				.setEmoji('✌️')
-				.setStyle('DANGER')
+				.setStyle(ButtonStyle.Danger)
 				.setDisabled(p1disabled)
 		])
 	if(!bot) {
-		const row2 = new MessageActionRow()
+		const row2 = new ActionRowBuilder()
 			.addComponents([
-				new MessageButton()
+				new ButtonBuilder()
 					.setCustomId('p2')
 					.setLabel(p2name)
-					.setStyle('SECONDARY')
+					.setStyle(ButtonStyle.Secondary)
 					.setDisabled(true),
-				new MessageButton()
+				new ButtonBuilder()
 					.setCustomId('p2rock')
 					.setEmoji('✊')
-					.setStyle('PRIMARY')
+					.setStyle(ButtonStyle.Primary)
 					.setDisabled(p2disabled),
-				new MessageButton()
+				new ButtonBuilder()
 					.setCustomId('p2paper')
 					.setEmoji('🖐️')
-					.setStyle('SUCCESS')
+					.setStyle(ButtonStyle.Success)
 					.setDisabled(p2disabled),
-				new MessageButton()
+				new ButtonBuilder()
 					.setCustomId('p2scissors')
 					.setEmoji('✌️')
-					.setStyle('DANGER')
+					.setStyle(ButtonStyle.Danger)
 					.setDisabled(p2disabled)
 			])
 		return [row1, row2]
@@ -79,7 +79,7 @@ function createRow(p1name, p2name, p1disabled, p2disabled, bot) {
 }
 
 function createEmbed(p1, p2, round, state) {
-	const embed = new MessageEmbed()
+	const embed = new EmbedBuilder()
 		.setAuthor({name: p1.user.username+' is challenging '+p2.user.username,iconURL: p1.user.displayAvatarURL()})
 		.setThumbnail(p2.user.displayAvatarURL())
 		.setTitle(`Round ${round}`)
@@ -164,14 +164,14 @@ async function collect(interact, p1, p2, rounds) {
 		}
 		return true
 	}
-	const collector = interact.createMessageComponentCollector({filter, time: 600000, componentType: 'BUTTON'})
+	const collector = interact.createMessageComponentCollector({filter, time: 600000, componentType: ComponentType.Button})
 	if(!p2.user.bot) {
 		setTimeout( async () => {
 			if(!started) {
 				const dmChannel = await p2.user.createDM()
-				await dmChannel.send({content: `<@${p1.user.id}> wants to challange you at Rock Paper Scissors!\nYou have 5 minutes to accept it.`, components: [new MessageActionRow().addComponents([new MessageButton().setStyle('LINK').setLabel('To Battle').setURL(interact.url)])]})
+				await dmChannel.send({content: `<@${p1.user.id}> wants to challange you at Rock Paper Scissors!\nYou have 5 minutes to accept it.`, components: [new ActionRowBuilder().addComponents([new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('To Battle').setURL(interact.url)])]})
 			}
-		}, 300000)
+		}, 10000)
 	}
 	let p1click = false
 	let p2click = false
@@ -256,14 +256,14 @@ async function collect(interact, p1, p2, rounds) {
 				user1.losts++
 				user2.wins++
 			}
-		 	interact.embeds[0].description = `**${winner}** is the Final Winner!`
+		 	interact.embeds[0].data.description = `**${winner}** is the Final Winner!`
 			if(p1.wins == p2.wins) {
-				interact.embeds[0].description = 'What a Draw!'
+				interact.embeds[0].data.description = 'What a Draw!'
 				user1.draws++
 				user2.draws++
 			}
 		}else {
-			interact.embeds[0].description = 'Timeout!'
+			interact.embeds[0].data.description = 'Timeout!'
 			user1.incomplete++
 			user2.incomplete++
 		}
@@ -291,7 +291,6 @@ module.exports = {
 				.setMaxValue(10)
 		}),
 	async execute(interaction) {
-		if(!interaction.channel || interaction.channel.type != 'GUILD_TEXT') return interaction.reply('Sorry. This command is only available in servers.')
 		if(interaction.options.getUser('user') && interaction.options.getUser('user').bot && interaction.options.getUser('user').id != interaction.client.user.id) return interaction.reply('How are you going to play with a bot?')
 		if(interaction.options.getUser('user') && !interaction.guild.members.cache.get(interaction.options.getUser('user').id)) return interaction.reply('The user is not in this server!')
 		const rounds = interaction.options.getInteger('rounds') || 3

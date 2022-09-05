@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const help = require('./encourage/help')
 const add = require('./encourage/add')
 const list = require('./encourage/list')

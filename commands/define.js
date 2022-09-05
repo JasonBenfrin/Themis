@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js')
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js')
 const http = require("https");
 
 function urlAdd(message) {
@@ -48,7 +47,7 @@ function createEmbed(word, url, def, likes, dislikes, example, time, author) {
 	if(def.length >= 1024) def = def.substring(0, 1021)+'...'
 	if(example.length >= 1024) example = example.substring(0, 1021)+'...'
 	if(author.length >= 256) author = author.substring(0, 253)+'...'
-	const embed = new MessageEmbed()
+	const embed = new EmbedBuilder()
 		.setTitle(word)
 	  .setURL(url)
 		.addFields([
@@ -58,22 +57,22 @@ function createEmbed(word, url, def, likes, dislikes, example, time, author) {
 			{name: '\u200B', value: `👍: ${likes}`, inline: true},
 			{name: '\u200B', value: `👎: ${dislikes}`, inline: true}
 		])
-		.setTimestamp(time)
+		.setTimestamp(new Date(time))
 		.setAuthor({name: author, url: `https://www.urbandictionary.com/author.php?author=${encodeURI(author)}`})
 	return embed
 }
 
 function createButton(offset, length) {
-	const row = new MessageActionRow()
+	const row = new ActionRowBuilder()
 		.addComponents(
-			new MessageButton()
+			new ButtonBuilder()
 	      .setCustomId('back')
 	      .setEmoji('◀')
-	      .setStyle('PRIMARY'),
-	    new MessageButton()
+	      .setStyle(ButtonStyle.Primary),
+	    new ButtonBuilder()
 	      .setCustomId('front')
 	      .setEmoji('▶')
-	      .setStyle('PRIMARY')
+	      .setStyle(ButtonStyle.Primary)
 		)
 	if(offset == 0){
 		row.components[0].setDisabled(true)
@@ -113,7 +112,7 @@ async function collect(interaction, interact, list, offset) {
 			return false
 		}
 	}
-	const collector = interact.createMessageComponentCollector({filter, time: 600000, componentType: 'BUTTON'})
+	const collector = interact.createMessageComponentCollector({filter, time: 600000})
 	collector.on('collect', async i => {
 		if(i.customId == 'back') {
 			offset--

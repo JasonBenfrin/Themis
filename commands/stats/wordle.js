@@ -1,6 +1,6 @@
 const Database = require('@replit/database')
 const db = new Database()
-const { MessageEmbed } = require('discord.js')
+const { EmbedBuilder } = require('discord.js')
 
 module.exports = {
 	async execute(interaction, user) {
@@ -8,7 +8,7 @@ module.exports = {
 		const users = await db.get('wordle')
 		const member = users[user.id]
 		if(!member) return interaction.reply('Wow! This user hasn\'t played a single Wordle!')
-		const embed = new MessageEmbed()
+		const embed = new EmbedBuilder()
 			.setTitle(`Wordle stats for ${user.tag}`)
 			.setAuthor({name: user.username,iconURL: user.displayAvatarURL()})
 			.setColor(user.hexAccentColor)

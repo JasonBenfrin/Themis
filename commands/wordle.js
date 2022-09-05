@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders')
-const { MessageEmbed, MessageAttachment } = require('discord.js')
+const { EmbedBuilder, AttachmentBuilder, SlashCommandBuilder } = require('discord.js')
 const Database = require('@replit/database')
 const db = new Database()
 const Canvas = require('canvas')
@@ -38,7 +37,7 @@ class Wordle {
 }
 
 function createEmbed(win, word) {
-	const embed = new MessageEmbed()
+	const embed = new EmbedBuilder()
 		.setColor('#ffffff')
 		.setImage('attachment://wordle.png')
 		.setFooter({text: `Guess a 5 letter word.\nThe game will end after 10 minutes of inactivity.`})
@@ -158,7 +157,7 @@ async function collect(interaction, word) {
 	if(!channel) channel = await interaction.client.users.cache.get(interaction.user.id).createDM()
 	const collector = await channel.createMessageCollector({ filter, time: 10*60000, max: 6 })
 	const initialCanvas = createCanvas([])
-	const initialAttachment = new MessageAttachment(initialCanvas.toBuffer(), "wordle.png")
+	const initialAttachment = new AttachmentBuilder(initialCanvas.toBuffer(), { name: "wordle.png"})
 	const initialEmbed = createEmbed()
 	let interact = await interaction.followUp({ embeds: [initialEmbed], files: [initialAttachment], fetchReply: true })
 	
@@ -178,7 +177,7 @@ async function collect(interaction, word) {
 			embed = createEmbed()
 		}
 		const canvas = createCanvas(guesses)
-		const attachment = new MessageAttachment(canvas.toBuffer(), 'wordle.png')
+		const attachment = new AttachmentBuilder(canvas.toBuffer(), {name: 'wordle.png'})
 		await interact.removeAttachments()
 		interact = await interaction.editReply({ embeds: [embed], files: [attachment], fetchReply: true })
 		if(m.channel.type != 'DM') {
@@ -222,7 +221,7 @@ async function collect(interaction, word) {
 			const embed = createEmbed(false, word)
 			embed.setTitle('Timeout!')
 			const canvas = createCanvas(guesses)
-			const attachment = new MessageAttachment(canvas.toBuffer(), 'wordle.png')
+			const attachment = new AttachmentBuilder(canvas.toBuffer(), {name: 'wordle.png'})
 			await interact.removeAttachments()
 			interaction.editReply({ embeds: [embed], files: [attachment] })
 		}

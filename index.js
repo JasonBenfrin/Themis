@@ -1,12 +1,12 @@
 const fs = require('fs');
-const { Client, Collection, Intents } = require('discord.js');
+const { Client, Collection, IntentsBitField } = require('discord.js');
 const token = process.env.token
 const updateCommands = require('./deploy-commands')
 const Database = require("@replit/database")
 const db = new Database()
 const keepAlive = require('./server')
 
-const client = new Client({ intents: new Intents(37635) });
+const client = new Client({ intents: new IntentsBitField(37635) });
 
 //Commands Handler
 

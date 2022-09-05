@@ -1,18 +1,17 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js')
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js')
 const { sort } = require('../level/leaderboard.js')
 
 function createButton(offset, length) {
-	const row = new MessageActionRow()
+	const row = new ActionRowBuilder()
 		.addComponents(
-			new MessageButton()
+			new ButtonBuilder()
 	      .setCustomId('back')
 	      .setEmoji('◀')
-	      .setStyle('PRIMARY'),
-	    new MessageButton()
+	      .setStyle(ButtonStyle.Primary),
+	    new ButtonBuilder()
 	      .setCustomId('front')
 	      .setEmoji('▶')
-	      .setStyle('PRIMARY')
+	      .setStyle(ButtonStyle.Primary)
 		)
 	if(offset == 0){
 		row.components[0].setDisabled(true)
@@ -28,7 +27,7 @@ function createButton(offset, length) {
 }
 
 function createEmbed(users, offset, name) {
-	const embed = new MessageEmbed()
+	const embed = new EmbedBuilder()
 			.setColor('#FFB063')
 			.setTitle('Leaderboard')
 			.setDescription(`Leaderboard for ${name}`)
@@ -36,7 +35,7 @@ function createEmbed(users, offset, name) {
 			.setFooter({text: `Bot Version: Release ${process.env.version}`, iconURL: 'https://i.imgur.com/l3vDws1.png'})
 	users.forEach(user => {
 		const thisUser = Object.values(user)[0]
-		embed.addField(`${offset+1}. ${thisUser.name}`,`Level: **${thisUser.level}**`)
+		embed.addFields({name: `${offset+1}. ${thisUser.name}`, value: `Level: **${thisUser.level}**`})
 		offset++
 	})
 	return embed
@@ -75,7 +74,7 @@ async function collect(interaction, interact, leaderboard, offset) {
 		}
 	}
 
-	const collector = interact.createMessageComponentCollector({ filter, time: 600000, componentType: 'BUTTON' })
+	const collector = interact.createMessageComponentCollector({ filter, time: 600000 })
 	
 	collector.on('collect', async i => {
 		if(i.customId == 'back') {

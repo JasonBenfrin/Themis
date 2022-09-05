@@ -1,7 +1,6 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js')
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js')
 
-const help = new MessageEmbed()
+const help = new EmbedBuilder()
   .setColor('#a4cfef')
   .setTitle('Help')
   .setAuthor({name: 'Encourage Bot', iconURL: 'https://i.imgur.com/l3vDws1.png'})

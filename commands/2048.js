@@ -1,5 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton, MessageEmbed, MessageAttachment } = require('discord.js')
+const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, AttachmentBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js')
+const { ComponentType } = require('discord-api-types/v10')
 const Canvas = require('canvas')
 const Database = require('@replit/database')
 const db = new Database()
@@ -24,25 +24,25 @@ class User {
 }
 
 function createButton() {
-	const row = new MessageActionRow()
+	const row = new ActionRowBuilder()
 		.addComponents(
 			[
-				new MessageButton()
+				new ButtonBuilder()
 					.setCustomId('left')
 					.setEmoji('◀️')
-					.setStyle('PRIMARY'),
-				new MessageButton()
+					.setStyle(ButtonStyle.Primary),
+				new ButtonBuilder()
 					.setCustomId('up')
 					.setEmoji('🔼')
-					.setStyle('PRIMARY'),
-			 	new MessageButton()
+					.setStyle(ButtonStyle.Primary),
+			 	new ButtonBuilder()
 				 	.setCustomId('down')
 				 	.setEmoji('🔽')
-				 	.setStyle('PRIMARY'),
-				new MessageButton()
+				 	.setStyle(ButtonStyle.Primary),
+				new ButtonBuilder()
 					.setCustomId('right')
 					.setEmoji('▶️')
-					.setStyle('PRIMARY')
+					.setStyle(ButtonStyle.Primary)
 			]
 		)
 	return row
@@ -299,7 +299,7 @@ module.exports = {
 		}
 
 		function createEmbed() {
-			const embed = new MessageEmbed()
+			const embed = new EmbedBuilder()
 				.setDescription(`Score: ${score}`)
 				.setColor('#ffd342')
 				.setImage('attachment://2048.png')
@@ -316,7 +316,7 @@ module.exports = {
 		}
 		
 		const canvas = createCanvas()
-		const attachment = new MessageAttachment(canvas.toBuffer(), '2048.png')
+		const attachment = new AttachmentBuilder(canvas.toBuffer(), {name: '2048.png'})
 		let interact = await interaction.followUp({embeds: [createEmbed()], components: [createButton()], files: [attachment], fetchReply: true})
 
 		const filter = i => {
@@ -327,7 +327,7 @@ module.exports = {
 			}
 			return true
 		}
-		const collector = await interact.createMessageComponentCollector({filter, time: 600000, componentType: 'BUTTON'})
+		const collector = await interact.createMessageComponentCollector({filter, time: 600000, componentType: ComponentType.Button})
 		collector.on('collect', async i => {
 			switch (i.customId) {
 				case 'up':
@@ -374,7 +374,7 @@ module.exports = {
 				}
 			}
 			await interact.removeAttachments()
-			interact = await interact.edit({embeds: [embed], components: [createButton()], files: [new MessageAttachment(createCanvas().toBuffer(), '2048.png')]})
+			interact = await interact.edit({embeds: [embed], components: [createButton()], files: [new AttachmentBuilder(createCanvas().toBuffer(), {name: '2048.png'})]})
 		})
 
 		collector.on('end', async (collected, reason) => {
@@ -390,7 +390,7 @@ module.exports = {
 			interact.components[0].components.forEach(button => button.disabled = true)
 			const rows = interact.components
 			await interact.removeAttachments()
-			await interact.edit({embeds: [embed], components: rows, files: [new MessageAttachment(createCanvas().toBuffer(),'2048.png')]})
+			await interact.edit({embeds: [embed], components: rows, files: [new AttachmentBuilder(createCanvas().toBuffer(),{name: '2048.png'})]})
 		})
 	}
 }

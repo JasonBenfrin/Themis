@@ -1,4 +1,4 @@
-const { MessageAttachment } = require('discord.js')
+const { AttachmentBuilder } = require('discord.js')
 const Canvas = require('canvas')
 
 Canvas.registerFont('./fonts/Roboto-Medium.ttf', {family: 'Roboto'});
@@ -117,7 +117,7 @@ module.exports = {
 		const countLength = context.measureText(countMessage).width
 		context.fillText(countMessage, (canvas.width-countLength)/2, canvas.height/2+110)
 		
-		const attachment = new MessageAttachment(canvas.toBuffer(), "new-member.png")
+		const attachment = new AttachmentBuilder(canvas.toBuffer(), "new-member.png")
 		member.client.channels.cache.get('880856257991409707').send({content: `Welcome <@${member.id}>!`, files: [attachment]})
   }
 }

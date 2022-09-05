@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 
@@ -19,10 +18,10 @@ module.exports = {
 		.setName('quote')
 		.setDescription('Sends a random quote'),
 	async execute(interaction) {
-    const quote = new MessageEmbed()
+    const quote = new EmbedBuilder()
     .setColor('#4af7aa')
     getQuote().then(get => {
-      quote.addField(get[0],`- ${get[1]}`)
+      quote.addFields({name: get[0], value: `- ${get[1]}`})
       return interaction.reply({ embeds: [quote] })
     })
 	},
