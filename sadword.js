@@ -4,7 +4,7 @@ const db = new Database()
 
 module.exports = {
 	async detector(message){
-		if (message.member.user.bot) return
+		if (message.author.bot) return
 		const users = await db.get('noDisturb_on')
 		if(users.includes(message.author.id)) return
 		for(i=0; i<sad_words.length; i++) {
