@@ -1,7 +1,5 @@
-const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, SlashCommandBuilder, ButtonStyle } = require('discord.js')
-const { ComponentType } = require('discord-api-types/v10')
-const Database = require('@replit/database')
-const db = new Database()
+import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, SlashCommandBuilder, ButtonStyle } from 'discord.js'
+import { ComponentType } from 'discord-api-types/v10'
 
 const botChoices = ['rock','paper','scissors']
 
@@ -146,6 +144,7 @@ function createEmbed(p1, p2, round, state) {
 }
 
 async function collect(interact, p1, p2, rounds) {
+	const redis = interact.client.redis
 	let nowPlaying = 1
 	let started = false
 	const filter = i => {
@@ -240,9 +239,12 @@ async function collect(interact, p1, p2, rounds) {
 	})
 
 	collector.on('end', async (c, reason) => {
-		const users = await db.get('rps')
-		const user1 = users[p1.user.id]
-		const user2 = users[p2.user.id]
+		const user1 = await redis.json.get("rps", {
+			path: p1.user.id
+		})
+		const user2 = await redis.json.get("rps", {
+			path: p2.user.id
+		})
 		if(!started) {
 			interact.embeds[0].description = 'Your opponent did not accept your challange!'
 		}else if(reason == 'ends') {
@@ -269,48 +271,55 @@ async function collect(interact, p1, p2, rounds) {
 		}
 		user1.incomplete--
 		user2.incomplete--
-		await db.set('rps',users)
+		await redis.json.set("rps", p1.user.id, user1)
+		await redis.json.set("rps", p2.user.id, user2)
 		await interact.edit({embeds: interact.embeds, components: createRow(p1.user.username, p2.user.username, true, true, p2.user.bot)})
 	})
 }
 
-module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('rock-paper-scissors')
-		.setDescription('Play Rock Paper Scissors')
-		.addUserOption(option => {
-			return option
-				.setName('user')
-				.setDescription('User to play with')
-		})
-		.addIntegerOption(option => {
-			return option
-				.setName('rounds')
-				.setDescription('Number of rounds to play.')
-				.setMinValue(1)
-				.setMaxValue(10)
-		}),
-	async execute(interaction) {
-		if(interaction.options.getUser('user') && interaction.options.getUser('user').bot && interaction.options.getUser('user').id != interaction.client.user.id) return interaction.reply('How are you going to play with a bot?')
-		if(interaction.options.getUser('user') && !interaction.guild.members.cache.get(interaction.options.getUser('user').id)) return interaction.reply('The user is not in this server!')
-		const rounds = interaction.options.getInteger('rounds') || 3
-		const opponent = interaction.options.getUser('user') || interaction.client.user
-		const p1 = new Player(interaction.user, 0, null)
-		const p2 = new Player(opponent, 0, null)
-		if(p1.user.id == p2.user.id) return interaction.reply('You cannot play with yourself!')
+export const data = new SlashCommandBuilder()
+	.setName('rock-paper-scissors')
+	.setDescription('Play Rock Paper Scissors')
+	.addUserOption(option => {
+		return option
+			.setName('user')
+			.setDescription('User to play with')
+	})
+	.addIntegerOption(option => {
+		return option
+			.setName('rounds')
+			.setDescription('Number of rounds to play.')
+			.setMinValue(1)
+			.setMaxValue(10)
+	})
+export async function execute(interaction) {
+	if (interaction.options.getUser('user') && interaction.options.getUser('user').bot && interaction.options.getUser('user').id != interaction.client.user.id) return interaction.reply('How are you going to play with a bot?')
+	if (interaction.options.getUser('user') && !interaction.guild.members.cache.get(interaction.options.getUser('user').id)) return interaction.reply('The user is not in this server!')
+	const rounds = interaction.options.getInteger('rounds') || 3
+	const opponent = interaction.options.getUser('user') || interaction.client.user
+	const p1 = new Player(interaction.user, 0, null)
+	const p2 = new Player(opponent, 0, null)
+	if (p1.user.id == p2.user.id) return interaction.reply('You cannot play with yourself!')
+	const redis = interaction.client.redis
 
-		const users = await db.get('rps')
-		const user1 = users[p1.user.id]
-		const user2 = users[p2.user.id]
-		if(!user1) users[p1.user.id] = new User(0,0,0,0,0)
-		if(!user2) users[p2.user.id] = new User(0,0,0,0,0)
-		users[p1.user.id].number++
-		users[p2.user.id].number++
-		users[p1.user.id].incomplete++
-		users[p2.user.id].incomplete++
-		await db.set('rps',users)
-		
-		let interact = await interaction.reply({ embeds: [createEmbed(p1, p2, 1, 'waiting')], components: createRow(p1.user.username, p2.user.username, false, false, p2.user.bot), fetchReply: true})
-		collect(interact, p1, p2, rounds)
-	}
-};
+	let user1
+	let user2
+	if (!(await redis.json.type("rps", p1.user.id))) user1 = new User(0, 0, 0, 0, 0)
+	else user1 = await redis.json.get("rps", {
+		path: p1.user.id
+	})
+	if (!(await redis.json.type("rps", p2.user.id))) user2 = new User(0, 0, 0, 0, 0)
+	else user2 = await redis.json.get("rps", {
+		path: p2.user.id
+	})
+
+	user1.number++
+	user2.number++
+	user1.incomplete++
+	user2.incomplete++
+	await redis.json.set("rps", p1.user.id, user1)
+	await redis.json.set("rps", p2.user.id, user2)
+
+	let interact = await interaction.reply({ embeds: [createEmbed(p1, p2, 1, 'waiting')], components: createRow(p1.user.username, p2.user.username, false, false, p2.user.bot), fetchReply: true })
+	collect(interact, p1, p2, rounds)
+}

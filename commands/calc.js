@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, SlashCommandBuilder, ButtonStyle } = require('discord.js')
+import { ActionRowBuilder, ButtonBuilder, SlashCommandBuilder, ButtonStyle } from 'discord.js'
 
 function page1Rows() {
 	const row1 = new ActionRowBuilder()
@@ -262,13 +262,11 @@ async function collect(interact, interaction) {
 	})
 }
 
-module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('calc')
-		.setDescription('Opens calculator'),
-	guild: ['925349183177756692'],
-	async execute(interaction) {
-		const interact = await interaction.reply({content: "``` ```", components: page1Rows(), fetchReply: true})
-		collect(interact, interaction)
-	}
+export const data = new SlashCommandBuilder()
+	.setName('calc')
+	.setDescription('Opens calculator')
+export const guild = ['925349183177756692']
+export async function execute(interaction) {
+	const interact = await interaction.reply({ content: "``` ```", components: page1Rows(), fetchReply: true })
+	collect(interact, interaction)
 }

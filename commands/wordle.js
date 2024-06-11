@@ -1,16 +1,15 @@
-const { EmbedBuilder, AttachmentBuilder, SlashCommandBuilder } = require('discord.js')
-const Database = require('@replit/database')
-const db = new Database()
-const Canvas = require('canvas')
-const fs = require('fs')
+import { EmbedBuilder, AttachmentBuilder, SlashCommandBuilder } from 'discord.js'
+import { registerFont, createCanvas as _createCanvas } from 'canvas'
+import { readFileSync } from 'fs'
+import path from 'path';
 
-Canvas.registerFont('./fonts/Roboto-Medium.ttf', {family: 'Roboto'});
-Canvas.registerFont('./fonts/Quicksand-Bold.ttf', {family: 'Quicksand'});
-Canvas.registerFont('./fonts/Bungee-Regular.ttf', {family: 'Bungee'});
-Canvas.registerFont('./fonts/Comfortaa-Bold.ttf', {family: 'Comfortaa'});
-Canvas.registerFont('./fonts/Arvo-Regular.ttf', {family: 'Arvo'});
+registerFont('./fonts/Roboto-Medium.ttf', {family: 'Roboto'});
+registerFont('./fonts/Quicksand-Bold.ttf', {family: 'Quicksand'});
+registerFont('./fonts/Bungee-Regular.ttf', {family: 'Bungee'});
+registerFont('./fonts/Comfortaa-Bold.ttf', {family: 'Comfortaa'});
+registerFont('./fonts/Arvo-Regular.ttf', {family: 'Arvo'});
 
-const wordle = JSON.parse(fs.readFileSync(__dirname+'/wordle/wordle.json'))
+const wordle = JSON.parse(readFileSync('./commands/wordle/wordle.json'))
 
 const yellow = '#c9b458'
 const green = '#6aaa64'
@@ -53,12 +52,12 @@ function createEmbed(win, word) {
 }
 
 function createCanvas(guesses) {
-	const canvas = Canvas.createCanvas( 1000, 600 )
+	const canvas = _createCanvas( 1000, 600 )
 	const context = canvas.getContext('2d')
 	let word = 0;
-	for(j=0; j < canvas.height; j+=canvas.height/6) {
+	for(let j=0; j < canvas.height; j+=canvas.height/6) {
 	  let letter = 0;
-	  for(i=0; i < canvas.width/2; i+=canvas.width/10) {
+	  for(let i=0; i < canvas.width/2; i+=canvas.width/10) {
 			context.strokeStyle = '#999999'
 			context.lineWidth = 3
 			context.beginPath()
@@ -97,13 +96,13 @@ function keyboardCanvas(guesses) {
 			}
 	  })
 	})
-	const canvas = Canvas.createCanvas( 1000, 350 )
+	const canvas = _createCanvas( 1000, 350 )
 	const context = canvas.getContext('2d')
 	let count = 0;
-	for(j=0; j < canvas.height; j += canvas.height/3){
+	for(let j=0; j < canvas.height; j += canvas.height/3){
 	  const rowOffset = canvas.width/10*count/2
 	  let arrayCount = 0;
-	  for(i=0; i < canvas.width/10*(10-count); i += canvas.width/10){
+	  for(let i=0; i < canvas.width/10*(10-count); i += canvas.width/10){
 	    if(count == 2 && arrayCount == 7) break
 	    context.beginPath()
 	    context.arc(i+radius+rowOffset+offset2,j+radius+offset2,radius,Math.PI,3*Math.PI/2)
@@ -125,6 +124,7 @@ function keyboardCanvas(guesses) {
 }
 
 async function collect(interaction, word) {
+	const redis = interaction.client.redis
 	let state;
 	const filter = m => {
 		m.content = m.content.toLowerCase()
@@ -188,35 +188,37 @@ async function collect(interaction, word) {
 	
 	collector.on('end', async (collected, reason) => {
 		interaction.client.wordle.set(interaction.user.id,false)
-		const users = await db.get('wordle')
+		const user = await redis.json.get("wordle", {
+			path: interaction.user.id
+		})
 		if(state === true) {
-			users[interaction.user.id].wins++
+			user.wins++
 			switch (collected.size) {
 				case 1:
-					users[interaction.user.id].one++
+					user.one++
 					break;
 				case 2:
-					users[interaction.user.id].two++
+					user.two++
 					break;
 				case 3:
-					users[interaction.user.id].three++
+					user.three++
 					break;
 				case 4:
-					users[interaction.user.id].four++
+					user.four++
 					break;
 				case 5:
-					users[interaction.user.id].five++
+					user.five++
 					break;
 				case 6:
-					users[interaction.user.id].six++
+					user.six++
 					break;
 				default: console.log(collected.size)
 			}
 		}else if(state === false) {
-			users[interaction.user.id].lost++
+			user.lost++
 		}
-		users[interaction.user.id].incomplete--
-		db.set('wordle', users)
+		user.incomplete--
+		await redis.json.set("wordle", interaction.user.id, user)
 		if(reason == 'time') {
 			const embed = createEmbed(false, word)
 			embed.setTitle('Timeout!')
@@ -232,7 +234,7 @@ function makeArray(word, answer) {
 	const array = []
 	const letterWord = word.toUpperCase().split('')
 	const letterAnswer = answer.toUpperCase().split('')
-	for(i=0; i<5; i++) {
+	for(let i=0; i<5; i++) {
 		const obj = { letter: letterWord[i] }
 		if(letterWord[i] == letterAnswer[i]) {
 			obj.color = green
@@ -246,23 +248,24 @@ function makeArray(word, answer) {
 	return array
 }
 
-module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('wordle')
-		.setDescription('Play wordle!'),
-	async execute(interaction) {
-		if(interaction.client.wordle.get(interaction.user.id)) return interaction.reply({ content: 'You are already playing a Wordle. Please finish it first', ephemeral: true })
-		await interaction.deferReply()
-		const word = wordle.words[Math.floor(Math.random()*wordle.words.length)]
-		const users = await db.get('wordle')
-		if(!users[interaction.user.id]) {
-			users[interaction.user.id] = new Wordle(1,1,0,0,0,0,0,0,0)
-		}else{
-			users[interaction.user.id].number++
-			users[interaction.user.id].incomplete++
-		}
-		db.set('wordle',users)
-		interaction.client.wordle.set(interaction.user.id, true)
-		collect(interaction, word)
-	},
-};
+export const data = new SlashCommandBuilder()
+	.setName('wordle')
+	.setDescription('Play wordle!')
+export async function execute(interaction) {
+	const redis = interaction.client.redis
+	if (interaction.client.wordle.get(interaction.user.id)) return interaction.reply({ content: 'You are already playing a Wordle. Please finish it first', ephemeral: true })
+	await interaction.deferReply()
+	const word = wordle.words[Math.floor(Math.random() * wordle.words.length)]
+	const user = await redis.json.get("wordle", {
+		path: interaction.user.id
+	})
+	if (!user) {
+		user = new Wordle(1, 1, 0, 0, 0, 0, 0, 0, 0)
+	} else {
+		user.number++
+		user.incomplete++
+	}
+	await redis.json.set("wordle", interaction.user.id, user)
+	interaction.client.wordle.set(interaction.user.id, true)
+	collect(interaction, word)
+}

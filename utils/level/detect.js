@@ -1,7 +1,5 @@
-const fs = require('fs')
-const Database = require('@replit/database')
-const db = new Database()
-const levels = JSON.parse(fs.readFileSync(__dirname + '/levelTotal.json'))
+import { readFileSync } from 'fs'
+const levels = JSON.parse(readFileSync('./utils/level/levelTotal.json'))
 
 class User {
 	constructor(name, level, exp, count) {
@@ -32,19 +30,20 @@ async function levelUp(message) {
 		Go to last line of this script
 	*/
 	const length = message.content.length
-	let lvl = await db.get('lvl')
-	let user = lvl[message.author.id]
-	if(!user) {
+	const redis = message.client.redis
+	let user
+	if(!(await redis.json.type("lvl", message.author.id))) {
 		user = new User(message.author.tag,0,calculateExp(length, 1, 0),1)
-		lvl[message.author.id] = user
-		return db.set('lvl', lvl)
+	} else {
+		user = await redis.json.get("lvl", {
+			path: message.author.id
+		})
+		user.name = message.author.tag
+		user.count++;
+		user.exp += calculateExp(length, user.count, user.level)
+		user.level = updateLevel(user.exp, user.level, message)
 	}
-	user.name = message.author.tag
-	user.count++;
-	user.exp += calculateExp(length, user.count, user.level)
-	user.level = updateLevel(user.exp, user.level, message)
-	lvl[message.author.id] = user
-	await db.set('lvl',lvl)
+	await redis.json.set("lvl", message.author.id, user)
 }
 
 function calculateExp(length, count, lvl) {
@@ -58,7 +57,6 @@ function calculateExp(length, count, lvl) {
 function updateLevel(exp, lvl, message) {
 	const nextLevel = levels[lvl+1]
 	const nextTwoLevel = levels[lvl+2]
-	const currentLevel = levels[lvl]
 	if(exp >= nextTwoLevel && exp < nextLevel) return lvl+1
 	if(exp >= nextLevel) {
 		const channel = message.client.channels.cache.get('961586482626322452')
@@ -68,25 +66,23 @@ function updateLevel(exp, lvl, message) {
 	return lvl
 }
 
-module.exports = {
-	detect(message) {
-		if(message.author.bot) return
-		if(message.guildId != '880856257991409704') return
-		const client = message.client
+export function detect(message) {
+	if (message.author.bot) return
+	if (message.guildId != '880856257991409704') return
+	const client = message.client
 
-		//Spam Detection
-		const spam = client.spamDetect
-		const recent = spam.get(message.author.id)
-		if(!recent) {
-			levelUp(message)
-			return spam.set(message.author.id, new Recent(new Date(), message.content))
-		}
-		if(new Date() - recent.time > 60000 && recent.msg != message.content) {
-			levelUp(message)
-			return spam.set(message.author.id, new Recent(new Date(), message.content))
-		}
-		spam.set(message.author.id, new Recent(recent.time, message.content))
+	//Spam Detection
+	const spam = client.spamDetect
+	const recent = spam.get(message.author.id)
+	if (!recent) {
+		levelUp(message)
+		return spam.set(message.author.id, new Recent(new Date(), message.content))
 	}
+	if (new Date() - recent.time > 60000 && recent.msg != message.content) {
+		levelUp(message)
+		return spam.set(message.author.id, new Recent(new Date(), message.content))
+	}
+	spam.set(message.author.id, new Recent(recent.time, message.content))
 }
 
 /* From up there 

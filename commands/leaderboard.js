@@ -1,18 +1,21 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js')
-const { sort } = require('../level/leaderboard.js')
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
+import { sort } from '../utils/level/leaderboard.js'
 
-function createButton(offset, length) {
+function createButton(offset, length, disabled=false) {
 	const row = new ActionRowBuilder()
 		.addComponents(
 			new ButtonBuilder()
 	      .setCustomId('back')
 	      .setEmoji('◀')
-	      .setStyle(ButtonStyle.Primary),
+	      .setStyle(ButtonStyle.Primary)
+				.setDisabled(disabled),
 	    new ButtonBuilder()
 	      .setCustomId('front')
 	      .setEmoji('▶')
 	      .setStyle(ButtonStyle.Primary)
+				.setDisabled(disabled)
 		)
+	if(disabled) return row
 	if(offset == 0){
 		row.components[0].setDisabled(true)
 		row.components[1].setDisabled(false)
@@ -41,25 +44,23 @@ function createEmbed(users, offset, name) {
 	return embed
 }
 
-module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('leaderboard')
-		.setDescription('Sends the leaderboard'),
-	async execute(interaction) {
-		const leaderboard = await sort()
-		if (leaderboard.length < 5) {
-			const embed = createEmbed(leaderboard, 0,interaction.guild.name)
-			return interaction.reply({embeds: [embed]})
-		}
-		const embed = createEmbed(leaderboard.slice(0,5),0,interaction.guild.name)
-		const buttons = createButton(0, leaderboard.length)
-		let interact = await interaction.reply({embeds: [embed], components: [buttons], fetchReply: true})
-		let offset = 0;
-		collect(interaction, interact, leaderboard, offset)
+export const data = new SlashCommandBuilder()
+	.setName('leaderboard')
+	.setDescription('Sends the leaderboard')
+export async function execute(interaction) {
+	const leaderboard = await sort(interaction.client.redis)
+	if (leaderboard.length < 5) {
+		const embed = createEmbed(leaderboard, 0, interaction.guild.name)
+		return interaction.reply({ embeds: [embed] })
 	}
+	const embed = createEmbed(leaderboard.slice(0, 5), 0, interaction.guild.name)
+	const buttons = createButton(0, leaderboard.length)
+	let message = await interaction.reply({ embeds: [embed], components: [buttons], fetchReply: true })
+	let offset = 0
+	collect(interaction, message, leaderboard, offset)
 }
 
-async function collect(interaction, interact, leaderboard, offset) {
+async function collect(interaction, message, leaderboard, offset) {
 	const filter = i => {
 		i.deferUpdate()
 		if(i.customId == 'back' || i.customId == 'front') {
@@ -74,7 +75,7 @@ async function collect(interaction, interact, leaderboard, offset) {
 		}
 	}
 
-	const collector = interact.createMessageComponentCollector({ filter, time: 600000 })
+	const collector = message.createMessageComponentCollector({ filter, time: 600000 })
 	
 	collector.on('collect', async i => {
 		if(i.customId == 'back') {
@@ -84,13 +85,10 @@ async function collect(interaction, interact, leaderboard, offset) {
 		}
 		const embed = createEmbed(leaderboard.slice(offset, offset+5), offset,interaction.guild.name)
 		const buttons = createButton(offset, leaderboard.length)
-		interact = await interaction.editReply({ embeds: [embed], components: [buttons], fetchReply: true })
+		message = await interaction.editReply({ embeds: [embed], components: [buttons], fetchReply: true })
 	})
 	
 	collector.on('end', () => {
-		interact.components[0].components.forEach(button => {
-			button.disabled = true
-		})
-		interaction.editReply({ embeds: interact.embeds, components: interact.components })
+		interaction.editReply({ embeds: message.embeds, components: [createButton(0, leaderboard.length, true)] })
 	})
 }

@@ -1,14 +1,13 @@
-const express = require("express")
-const server = express()
+import express from 'express'
+const app = express()
 
-server.all("/",(req,res)=>{
-  res.redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-} );
+app.all("/",(req,res)=>{
+  // TODO: Make dashboard?
+  res.send("hi")
+});
 
-function keepAlive(){
-  server.listen(3000,()=>{
+export default function keepAlive(){
+  app.listen(3000,()=>{
     console.log("Alive")
   })
 }
-
-module.exports=keepAlive

@@ -1,9 +1,8 @@
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord.js');
-const token = process.env.token
-const clientId = process.env.clientId
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord.js';
+const token = process.env.DISCORD_TOKEN
 
-function updateCommands(client) {
+export function updateCommands(client) {
   const publicCommands = [];
 	const privateCommands = new Map();
 
@@ -18,18 +17,15 @@ function updateCommands(client) {
 			})
 		}
 	})
-	
   const rest = new REST({ version: '9' }).setToken(token)
 
-  rest.put(Routes.applicationCommands(clientId), { body: publicCommands })
+  rest.put(Routes.applicationCommands(client.user.id), { body: publicCommands })
     .then(() => console.log('Successfully registered application commands.'))
     .catch(console.error);
 
 	privateCommands.forEach( (commands, guildId) => {
-		rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands })
+		rest.put(Routes.applicationGuildCommands(client.user.id, guildId), { body: commands })
 	    .then(() => console.log(`Successfully registered private application commands on guild ${guildId}.`))
 	    .catch(console.error);
 	})	
 }
-
-module.exports = { updateCommands };

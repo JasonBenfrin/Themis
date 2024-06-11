@@ -1,5 +1,5 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js')
-const http = require("https");
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js';
+import { request } from "https";
 
 function urlAdd(message) {
 	return message.replaceAll(/\[(.*?)\]/g, match => {
@@ -15,7 +15,7 @@ function urban(interaction, callback) {
 		"path": `/v0/define?term=${uri}`
 	}
 
-	const req = http.request(option, function (res) {
+	const req = request(option, function (res) {
 		const chunks = []
 		if(res.statusCode >= 300) {
 			interaction.followUp('Error while requesting.')
@@ -62,18 +62,21 @@ function createEmbed(word, url, def, likes, dislikes, example, time, author) {
 	return embed
 }
 
-function createButton(offset, length) {
+function createButton(offset, length, disabled=false) {
 	const row = new ActionRowBuilder()
 		.addComponents(
 			new ButtonBuilder()
 	      .setCustomId('back')
 	      .setEmoji('◀')
-	      .setStyle(ButtonStyle.Primary),
+	      .setStyle(ButtonStyle.Primary)
+				.setDisabled(disabled),
 	    new ButtonBuilder()
 	      .setCustomId('front')
 	      .setEmoji('▶')
 	      .setStyle(ButtonStyle.Primary)
+				.setDisabled(disabled)
 		)
+	if (disabled) return row
 	if(offset == 0){
 		row.components[0].setDisabled(true)
 		row.components[1].setDisabled(false)
@@ -94,11 +97,11 @@ async function sendDefine(list, interaction) {
 	const embed = createEmbed(bundle.word, bundle.permalink, bundle.definition, bundle.thumbs_up, bundle.thumbs_down, bundle.example, bundle.written_on, bundle.author)
 	if(list.length == 1) return interaction.followUp({embeds: [embed]})
 	const row = createButton(0, list.length)
-	let interact = await interaction.followUp({ embeds: [embed], components: [row], fetchReply: true })
-	collect(interaction, interact, list, 0)
+	let message = await interaction.followUp({ embeds: [embed], components: [row], fetchReply: true })
+	collect(interaction, message, list, 0)
 }
 
-async function collect(interaction, interact, list, offset) {
+async function collect(interaction, message, list, offset) {
 	const filter = i => {
 		i.deferUpdate()
 		if(i.customId == 'back' || i.customId == 'front') {
@@ -112,7 +115,7 @@ async function collect(interaction, interact, list, offset) {
 			return false
 		}
 	}
-	const collector = interact.createMessageComponentCollector({filter, time: 600000})
+	const collector = message.createMessageComponentCollector({filter, time: 600000})
 	collector.on('collect', async i => {
 		if(i.customId == 'back') {
 			offset--
@@ -122,30 +125,25 @@ async function collect(interaction, interact, list, offset) {
 		const bundle = list[offset]
 		const embed = createEmbed(bundle.word, bundle.permalink, bundle.definition, bundle.thumbs_up, bundle.thumbs_down, bundle.example, bundle.written_on, bundle.author)
 		const buttons = createButton(offset, list.length)
-		interact = await interaction.editReply({embeds: [embed], components: [buttons], fetchReply: true})
+		message = await interaction.editReply({embeds: [embed], components: [buttons], fetchReply: true})
 		collector.resetTimer()
 	})
 	
 	collector.on('end', () => {
-		interact.components[0].components.forEach(button => {
-			button.disabled = true
-		})
-		interaction.editReply({ embeds: interact.embeds, components: interact.components})
+		interaction.editReply({ embeds: message.embeds, components: [createButton(0, list.length, true)]})
 	})
 }
 
-module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('define')
-		.setDescription('Defines a word. (Urban dictionary)')
-		.addStringOption(option => {
-			return option
-				.setName('word')
-				.setDescription('Word to be defined. (Urban dictionary)')
-				.setRequired(true)
-		}),
-	async execute(interaction) {
-		await interaction.deferReply()
-		urban(interaction, sendDefine)
-	}
+export const data = new SlashCommandBuilder()
+	.setName('define')
+	.setDescription('Defines a word. (Urban dictionary)')
+	.addStringOption(option => {
+		return option
+			.setName('word')
+			.setDescription('Word to be defined. (Urban dictionary)')
+			.setRequired(true);
+	});
+export async function execute(interaction) {
+	await interaction.deferReply();
+	urban(interaction, sendDefine);
 }

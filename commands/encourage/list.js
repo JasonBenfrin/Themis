@@ -1,20 +1,21 @@
-const Database = require('@replit/database')
-const db = new Database()
-const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle } = require('discord.js');
-const { ComponentType } = require('discord-api-types/v10')
+import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle } from 'discord.js';
+import { ComponentType } from 'discord-api-types/v10';
 
-function createButton(offset, length) {
+function createButton(offset, length, disabled=false) {
 	const row = new ActionRowBuilder()
 	  .addComponents(
 	    new ButtonBuilder()
 	      .setCustomId('back')
 	      .setEmoji('◀')
-	      .setStyle(ButtonStyle.Primary),
+	      .setStyle(ButtonStyle.Primary)
+				.setDisabled(disabled),
 	    new ButtonBuilder()
 	      .setCustomId('front')
 	      .setEmoji('▶')
 	      .setStyle(ButtonStyle.Primary)
+				.setDisabled(disabled)
 	  )
+	if(disabled) return row
 	if(offset == 0){
 		row.components[0].setDisabled(true)
 		row.components[1].setDisabled(false)
@@ -44,20 +45,21 @@ function createEmbed(msgToTen, offset) {
 	return embed
 }
 
-module.exports = async function list(interaction) {
-	const messages = await db.get('encourage')
+export default async function list(interaction) {
+	const redis = interaction.client.redis
+	const messages = await redis.lRange("encourage", 0, -1)
 	if (messages.length < 10) {
 		const embed = createEmbed(messages, 0)
 		return interaction.reply({embeds: [embed]})
 	}
 	const embed = createEmbed(messages.slice(0,10),0)
 	const buttons = createButton(0, messages.length)
-	let interact = await interaction.reply({embeds: [embed], components: [buttons], fetchReply: true})
+	let message = await interaction.reply({embeds: [embed], components: [buttons], fetchReply: true})
 	let offset = 0;
-	collect(interaction, interact, messages, offset)
+	collect(interaction, message, messages, offset)
 }
 
-async function collect(interaction, interact, messages, offset) {
+async function collect(interaction, message, messages, offset) {
 	const filter = i => {
 		i.deferUpdate();
 		if(i.customId == 'back' || i.customId == 'front') {
@@ -72,7 +74,7 @@ async function collect(interaction, interact, messages, offset) {
 		}
 	}
 
-	const collector = interact.createMessageComponentCollector({ filter, time: 600000, componentType: ComponentType.Button })
+	const collector = message.createMessageComponentCollector({ filter, time: 600000, componentType: ComponentType.Button })
 	collector.on('collect', async i => {
 		if (i.customId == 'back') {
 			offset -= 10;
@@ -81,13 +83,10 @@ async function collect(interaction, interact, messages, offset) {
 		}
 		const embed = createEmbed(messages.slice(offset,offset+10), offset)
 		const buttons = createButton(offset, messages.length)
-		interact = await interaction.editReply({embeds: [embed], components: [buttons], fetchReply: true})
+		message = await interaction.editReply({embeds: [embed], components: [buttons], fetchReply: true})
 	})
 
 	collector.on('end', () => {
-		interact.components[0].components.forEach(button => {
-			button.disabled = true
-		})
-		interaction.editReply({embeds: interact.embeds, components: interact.components})
+		interaction.editReply({embeds: message.embeds, components: [createButton(0, messages.length, true)]})
 	})
 }

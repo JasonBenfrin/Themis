@@ -1,64 +1,73 @@
-const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, AttachmentBuilder, SelectMenuBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js')
-const { ComponentType } = require('discord-api-types/v10')
-const Canvas = require('canvas')
-const ai = require('tictactoe-complex-ai');
+import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, AttachmentBuilder, StringSelectMenuBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js';
+import { ComponentType } from 'discord-api-types/v10';
+import { registerFont, createCanvas as _createCanvas } from 'canvas';
+import { createAI } from 'tictactoe-complex-ai';
 
-Canvas.registerFont('./fonts/Roboto-Medium.ttf', {family: 'Roboto'});
-Canvas.registerFont('./fonts/Quicksand-Bold.ttf', {family: 'Quicksand'});
-Canvas.registerFont('./fonts/Bungee-Regular.ttf', {family: 'Bungee'});
-Canvas.registerFont('./fonts/Comfortaa-Bold.ttf', {family: 'Comfortaa'});
-Canvas.registerFont('./fonts/Arvo-Regular.ttf', {family: 'Arvo'});
+registerFont('./fonts/Roboto-Medium.ttf', {family: 'Roboto'});
+registerFont('./fonts/Quicksand-Bold.ttf', {family: 'Quicksand'});
+registerFont('./fonts/Bungee-Regular.ttf', {family: 'Bungee'});
+registerFont('./fonts/Comfortaa-Bold.ttf', {family: 'Comfortaa'});
+registerFont('./fonts/Arvo-Regular.ttf', {family: 'Arvo'});
 
 const xOff = 50
 const yOff = 50
 const radius = 32	
 
-function createRows(style) {
+function createRows(style, disabled=false) {
 	return [
 		new ActionRowBuilder()
 			.addComponents([
 				new ButtonBuilder()
 					.setCustomId('00')
 					.setLabel('A1')
-					.setStyle(style),
+					.setStyle(style)
+					.setDisabled(disabled),
 				new ButtonBuilder()
 					.setCustomId('01')
 					.setLabel('A2')
-					.setStyle(style),
+					.setStyle(style)
+					.setDisabled(disabled),
 				new ButtonBuilder()
 					.setCustomId('02')
 					.setLabel('A3')
 					.setStyle(style)
+					.setDisabled(disabled)
 			]),
 		new ActionRowBuilder()
 			.addComponents([
 				new ButtonBuilder()
 					.setCustomId('10')
 					.setLabel('B1')
-					.setStyle(style),
+					.setStyle(style)
+					.setDisabled(disabled),
 				new ButtonBuilder()
 					.setCustomId('11')
 					.setLabel('B2')
-					.setStyle(style),
+					.setStyle(style)
+					.setDisabled(disabled),
 				new ButtonBuilder()
 					.setCustomId('12')
 					.setLabel('B3')
 					.setStyle(style)
+					.setDisabled(disabled)
 			]),
 		new ActionRowBuilder()
 			.addComponents([
 				new ButtonBuilder()
 					.setCustomId('20')
 					.setLabel('C1')
-					.setStyle(style),
+					.setStyle(style)
+					.setDisabled(disabled),
 				new ButtonBuilder()
 					.setCustomId('21')
 					.setLabel('C2')
-					.setStyle(style),
+					.setStyle(style)
+					.setDisabled(disabled),
 				new ButtonBuilder()
 					.setCustomId('22')
 					.setLabel('C3')
 					.setStyle(style)
+					.setDisabled(disabled)
 			])
 	]
 }
@@ -77,34 +86,34 @@ function createEmbed(p1, p2, turn) {
 }
 
 function createCanvas(game) {
-	const canvas = Canvas.createCanvas(300, 300)
+	const canvas = _createCanvas(300, 300)
 	const context = canvas.getContext('2d')
 	context.lineWidth = 10
 	context.strokeStyle = '#888888'
 
-	for(i=canvas.width/3;i<canvas.width;i+=canvas.width/3) {
+	for(let i=canvas.width/3;i<canvas.width;i+=canvas.width/3) {
 	  context.moveTo(i,0)
 	  context.lineTo(i,canvas.height)
 	  context.stroke()
 	}
 	
-	for(i=canvas.width/3;i<canvas.width;i+=canvas.width/3) {
+	for(let i=canvas.width/3;i<canvas.width;i+=canvas.width/3) {
 	  context.moveTo(0,i)
 	  context.lineTo(canvas.width,i)
 	  context.stroke()
 	}
 	
 	let a = 0
-	for(j=canvas.height/6;j<canvas.height;j+=canvas.height/3) {
+	for(let j=canvas.height/6;j<canvas.height;j+=canvas.height/3) {
 	  let b = 0
-	  for(i=canvas.width/6;i<canvas.width;i+=canvas.width/3) {
+	  for(let i=canvas.width/6;i<canvas.width;i+=canvas.width/3) {
 	    if(game[a][b] == 'O') circle(i, j, context)
 	    else if(game[a][b] == 'X') cross(i, j, context)
 	    b++ 
 	  }
 	  a++
 	}
-	const canvas2 = Canvas.createCanvas(330,330)
+	const canvas2 = _createCanvas(330,330)
 	const context2 = canvas2.getContext('2d')
 	context2.drawImage(canvas, 30, 30)
 	
@@ -170,70 +179,70 @@ function aiToGame(pos) {
 	return [Math.floor(pos/3), pos%3]
 }
 
-module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('tictactoe')
-		.setDescription('Play Tic Tac Toe')
-		.addUserOption(option => {
-			return option
-				.setName('user')
-				.setDescription('User to play with')
-		}),
-	async execute(interaction) {
-		const user2 = interaction.options.getUser('user')
-		if(user2) {
-			if(user2.bot && user2.id != interaction.client.user.id) return interaction.reply('How are you going to play with a bot?')
-			if(!interaction.guild.members.cache.get(user2.id)) return interaction.reply('The user is not in this server!')
-			if(user2.id == interaction.user.id) return interaction.reply('You cannot play with yourself')
-		}
-		const p2 = interaction.options.getUser('user') || interaction.client.user
-		await interaction.deferReply()
-		const p1 = interaction.user
-		const game = [['','',''],['','',''],['','','']]
-		if(p2.bot) {
-			let interact = await interaction.followUp({embeds: [new EmbedBuilder().setTitle("Pick your difficulty").setColor('#9b84ec')], components: [new ActionRowBuilder().addComponents(
-				new SelectMenuBuilder()
+export const data = new SlashCommandBuilder()
+	.setName('tictactoe')
+	.setDescription('Play Tic Tac Toe')
+	.addUserOption(option => {
+		return option
+			.setName('user')
+			.setDescription('User to play with');
+	});
+export async function execute(interaction) {
+	const user2 = interaction.options.getUser('user');
+	if (user2) {
+		if (user2.bot && user2.id != interaction.client.user.id) return interaction.reply('How are you going to play with a bot?');
+		if (!interaction.guild.members.cache.get(user2.id)) return interaction.reply('The user is not in this server!');
+		if (user2.id == interaction.user.id) return interaction.reply('You cannot play with yourself');
+	}
+	const p2 = interaction.options.getUser('user') || interaction.client.user;
+	await interaction.deferReply();
+	const p1 = interaction.user;
+	const game = [['', '', ''], ['', '', ''], ['', '', '']];
+	if (p2.bot) {
+		let message = await interaction.followUp({
+			embeds: [new EmbedBuilder().setTitle("Pick your difficulty").setColor('#9b84ec')], components: [new ActionRowBuilder().addComponents(
+				new StringSelectMenuBuilder()
 					.setCustomId('difficulty')
 					.setPlaceholder('None')
 					.addOptions([
-						{ label: 'Easy', description: 'Baby mode', value: 'easy'},
-						{ label: 'Normal', description: 'Worthy opponent', value: 'normal'},
-						{ label: 'Hard', description: 'Sweaty games', value: 'hard'},
-						{ label: 'Expert', description: "Don't mess with this senator", value: 'expert'}
+						{ label: 'Easy', description: 'Baby mode', value: 'easy' },
+						{ label: 'Normal', description: 'Worthy opponent', value: 'normal' },
+						{ label: 'Hard', description: 'Sweaty games', value: 'hard' },
+						{ label: 'Expert', description: "Don't mess with this senator", value: 'expert' }
 					])
-			)], fetchReply: true})
-			const filter = async i => {
-				await i.deferUpdate()
-				if(i.user.id != p1.id) {
-					i.followUp({content: 'This menu is not for you!', ephemeral: true})
-					return false
-				}
-				return true
+			)], fetchReply: true
+		});
+		const filter = async (i) => {
+			await i.deferUpdate();
+			if (i.user.id != p1.id) {
+				i.followUp({ content: 'This menu is not for you!', ephemeral: true });
+				return false;
 			}
-			const collector = interact.createMessageComponentCollector({ filter, max: 1, time: 600000, componentType: ComponentType.SelectMenu })
-			collector.on('collect', async i => {
-				funGame(p1, p2, interact, game, i.values[0])
-			})
-			return
-		}
-		const canvas = createCanvas(game)
-		const image = new AttachmentBuilder(canvas.toBuffer(), {name: 'ttt.png'})
-		let interact = await interaction.followUp({embeds: [createEmbed(p1,p2,'p2')], components: createRows(ButtonStyle.Primary), files: [image], fetchReply: true})
-		funGame(p1, p2, interact, game)
-	},
-};
+			return true;
+		};
+		const collector = message.createMessageComponentCollector({ filter, max: 1, time: 600000, componentType: ComponentType.StringSelect });
+		collector.on('collect', async (i) => {
+			funGame(p1, p2, message, game, i.values[0]);
+		});
+		return;
+	}
+	const canvas = createCanvas(game);
+	const image = new AttachmentBuilder(canvas.toBuffer(), { name: 'ttt.png' });
+	let message = await interaction.followUp({ embeds: [createEmbed(p1, p2, 'p2')], components: createRows(ButtonStyle.Primary), files: [image], fetchReply: true });
+	funGame(p1, p2, message, game);
+}
 
-async function funGame(p1, p2, interact, game, difficulty) {
+async function funGame(p1, p2, message, game, difficulty) {
 	let gameOver = false
 	let turn = p2.id
 	let aiInstance;
 	if(difficulty) {
-		aiInstance = ai.createAI({level: difficulty, ai: 'X', player: 'O', empty: '', minResponseTime: 1000, maxResponseTime: 3000})
+		aiInstance = createAI({level: difficulty, ai: 'X', player: 'O', empty: '', minResponseTime: 1000, maxResponseTime: 3000})
 		const position = await aiInstance.play(game.flat())
 		const [a, b] = aiToGame(position)
 		game[a][b] = 'X'
 		turn = p1.id
-		interact = await interact.edit({embeds: [createEmbed(p1, p2, turn==p1.id ? 'p1' : 'p2')], files: [new AttachmentBuilder(createCanvas(game).toBuffer(), {name: 'ttt.png'})], fetchReply: true, components: createRows(ButtonStyle.Danger)})
+		message = await message.edit({embeds: [createEmbed(p1, p2, turn==p1.id ? 'p1' : 'p2')], files: [new AttachmentBuilder(createCanvas(game).toBuffer(), {name: 'ttt.png'})], fetchReply: true, components: createRows(ButtonStyle.Danger)})
 	}
 	const filter = async i => {
 		await i.deferUpdate()
@@ -256,7 +265,7 @@ async function funGame(p1, p2, interact, game, difficulty) {
 		return true
 	}
 	
-	const collector = interact.createMessageComponentCollector({ filter, max: 9, time: 600000 })
+	const collector = message.createMessageComponentCollector({ filter, max: 9, time: 600000 })
 	collector.on('collect', async i => {
 		if(turn == p1.id) {
 			game[parseInt(i.customId[0])][parseInt(i.customId[1])] = 'O'
@@ -278,16 +287,15 @@ async function funGame(p1, p2, interact, game, difficulty) {
 			return collector.stop()
 		}
 
-		interact = await interact.edit({embeds: [createEmbed(p1, p2, turn==p1.id ? 'p1' : 'p2')], files: [new AttachmentBuilder(createCanvas(game).toBuffer(), {name: 'ttt.png'})], components: createRows(turn==p1.id ? ButtonStyle.Danger : ButtonStyle.Primary), fetchReply: true})
+		message = await message.edit({embeds: [createEmbed(p1, p2, turn==p1.id ? 'p1' : 'p2')], files: [new AttachmentBuilder(createCanvas(game).toBuffer(), {name: 'ttt.png'})], components: createRows(turn==p1.id ? ButtonStyle.Danger : ButtonStyle.Primary), fetchReply: true})
 		collector.resetTimer()
 		if(gameEnd(game)) collector.stop()
 	})
 	
 	collector.on('end', async () => {
-		interact.components.forEach(l => l.components.forEach(b => b.data.disabled = true))
 		const end = gameEnd(game)
 		const embed = [createEmbed(p1, p2, 'p2')]
 		embed[0].data.description = end ? `${end == 'O' ? p1.username : p2.username} won!` : gameOver ? "DRAW!" : "Time's up!"
-		interact.edit({components: interact.components, embeds: embed, files: [new AttachmentBuilder(createCanvas(game).toBuffer(), {name: 'ttt.png'})]})
+		message.edit({components: createRows(ButtonStyle.Secondary, true), embeds: embed, files: [new AttachmentBuilder(createCanvas(game).toBuffer(), {name: 'ttt.png'})]})
 	})
 }

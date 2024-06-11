@@ -1,5 +1,5 @@
 {
-  "name": "Encourage-Bot-1",
+  "name": "themis",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -9,25 +9,24 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {},
   "dependencies": {
-    "@discordjs/rest": "^1.1.0",
-    "@replit/database": "^2.0.2",
-    "canvas": "^2.9.3",
-    "discord-api-types": "^0.37.5",
-    "discord.js": "^14.3.0",
-    "express": "^4.18.1",
-    "node": "^16.17.0",
-    "node-fetch": "^3.2.10",
+    "@discordjs/rest": "^2.3.0",
+    "canvas": "^2.11.2",
+    "discord-api-types": "^0.37.88",
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "redis": "^4.6.14",
     "tictactoe-complex-ai": "^1.0.1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JasonBenfrin/Encourage-Bot.git"
+    "url": "git+https://github.com/JasonBenfrin/Themis.git"
   },
   "bugs": {
-    "url": "https://github.com/JasonBenfrin/Encourage-Bot/issues"
+    "url": "https://github.com/JasonBenfrin/Themis/issues"
   },
-  "homepage": "https://github.com/JasonBenfrin/Encourage-Bot#readme",
-  "description": ""
+  "homepage": "https://github.com/JasonBenfrin/Themis#readme",
+  "description": "",
+  "type": "module"
 }

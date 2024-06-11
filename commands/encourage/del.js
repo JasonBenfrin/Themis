@@ -1,7 +1,5 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
-const { ComponentType } = require('discord-api-types/v10')
-const Database = require("@replit/database")
-const db = new Database()
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
+import { ComponentType } from 'discord-api-types/v10'
 
 function createButton(disable) {
 	const row = new ActionRowBuilder()
@@ -21,16 +19,16 @@ function createButton(disable) {
 }
 
 async function del(interaction) {
-
-  str = `Are you sure you want to delete ${interaction.options.getInteger('integer')}?`
-	const encourage = await db.get('encourage')
 	const integer = interaction.options.getInteger('integer')
-	if(integer >= encourage.length || integer < 0) {
-		return interaction.reply('The provided integer does not exist!\n *Please check *`/encourage list`* for correct index*')
-	}
 	if(integer <= 5) {
 		return interaction.reply('Sorry, these are master messages. They cannot be deleted')
 	}
+	const redis = interaction.client.redis
+	const msg = await redis.lIndex("encourage", integer)
+	if(integer < 0 || msg === null) {
+		return interaction.reply('The provided integer does not exist!\n *Please check *`/encourage list`* for correct index*')
+	}
+	const str = `Are you sure you want to delete ${integer}:${msg}?`
 	const interact = await interaction.reply({ components: [createButton(false)], content: str, fetchReply: true })
 	const filter = i => {
 		i.deferUpdate();
@@ -48,13 +46,12 @@ async function del(interaction) {
 	const collector = interact.createMessageComponentCollector({filter, time: 60000, componentType: ComponentType.Button, max: 1 })
 	collector.on('collect', async i => {
 		if(i.customId == 'yes') {
-			encourage.splice(integer, 1)
-			await db.set('encourage', encourage)
+			await redis.lRem("encourage", 0, msg)
 			return interaction.editReply({content: 'Message Deleted!', components: [createButton(true)]})
 		}else{
-			return interaction.editReply({content: 'Deletion cancelled!', components: [createButton(true)]})
+			return interaction.editReply({content: 'Cancelled!', components: [createButton(true)]})
 		}
 	})
 }
 
-module.exports = del
+export default del

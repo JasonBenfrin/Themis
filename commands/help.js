@@ -1,4 +1,4 @@
-const { EmbedBuilder, SlashCommandBuilder } = require('discord.js')
+import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 
 const help = new EmbedBuilder()
   .setColor('#a4cfef')
@@ -23,11 +23,9 @@ const help = new EmbedBuilder()
   .setTimestamp()
   .setFooter({text: `Bot Version: Release ${process.env.version}`,iconURL: 'https://i.imgur.com/l3vDws1.png'});
 
-module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('help')
-		.setDescription('Returns the available commands'),
-	async execute(interaction) {
-		return interaction.reply({ embeds: [help] });
-	},
-};
+export const data = new SlashCommandBuilder()
+  .setName('help')
+  .setDescription('Returns the available commands');
+export async function execute(interaction) {
+  return interaction.reply({ embeds: [help] });
+}
