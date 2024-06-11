@@ -1,4 +1,6 @@
-import { sort } from '../utils/level/leaderboard.js'
+import puppeteer from 'puppeteer-extra'
+import stealth from 'puppeteer-extra-plugin-stealth'
+import adblocker from 'puppeteer-extra-plugin-adblocker'
 import { updateCommands } from '../deploy-commands.js'
 import { createClient } from "redis"
 
@@ -23,6 +25,24 @@ export async function execute(client) {
 
 	client.spamDetect = new Map()
 	client.wordle = new Map()
+
+	puppeteer.use(stealth())
+	puppeteer.use(adblocker({
+		blockTrackers: true
+	}))
+
+	const browser = await puppeteer.launch()
+	const page = await browser.newPage()
+
+	client.browser = browser
+
+	await page.goto("https://aternos.org/go")
+  await page.type('input.username', process.env.ATERNOS_USERNAME)
+  await page.type('input.password', process.env.ATERNOS_PASSWORD)
+  await page.click('button.login-button')
+  await page.waitForSelector(".servercard")
+	await page.close()
+
 	client.user.setActivity('/help', { type: 'PLAYING' })
 	console.log(`Logged in with ${client.user.tag} on ${client.guilds.cache.size} servers`)
 }
