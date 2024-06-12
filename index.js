@@ -1,5 +1,6 @@
 import { readdirSync } from 'fs';
 import { Client, Collection, IntentsBitField } from 'discord.js';
+import fs from 'fs'
 import dotenv from 'dotenv'
 dotenv.config()
 import keepAlive from './server.js';
@@ -33,8 +34,12 @@ for (const file of eventFiles) {
 // client.on('debug',(debug) => console.log(debug))
 
 process.on('uncaughtException', (err) => {
-	console.error(err)
+	console.error((err && err.stack) ? err.stack : err)
 })
+
+console.log("Open latest.log to see console output")
+const log = fs.createWriteStream('./latest.log')
+process.stdout.write = process.stderr.write = log.write.bind(log)
 
 keepAlive()
 client.login(token);
