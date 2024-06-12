@@ -31,18 +31,19 @@ export async function execute(client) {
 		blockTrackers: true
 	}))
 
-	const browser = await puppeteer.launch()
-	const page = await browser.newPage()
-
-	client.browser = browser
-
-	await page.goto("https://aternos.org/go")
-  await page.type('input.username', process.env.ATERNOS_USERNAME)
-  await page.type('input.password', process.env.ATERNOS_PASSWORD)
-  await page.click('button.login-button')
-  await page.waitForSelector(".servercard")
-	await page.close()
+	client.getBrowser = async function () {
+		if (this.browser !== undefined && (await this.browser.pages()).length > 0) return this.browser
+		this.browser = await puppeteer.launch()
+		const page = await this.browser.newPage()
+		await page.goto("https://aternos.org/go")
+		await page.type('input.username', process.env.ATERNOS_USERNAME)
+		await page.type('input.password', process.env.ATERNOS_PASSWORD)
+		await page.click('button.login-button')
+		await page.waitForSelector(".servercard")
+		await page.close()
+		return this.browser
+	}
 
 	client.user.setActivity('/help', { type: 'PLAYING' })
 	console.log(`Logged in with ${client.user.tag} on ${client.guilds.cache.size} servers`)
-}
+} 

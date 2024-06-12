@@ -1,9 +1,8 @@
 import { ActionRowBuilder, AttachmentBuilder, ComponentType, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from "discord.js"
-import fs from "fs"
 
 export default async function detail(interaction) {
   await interaction.deferReply()
-  const browser = interaction.client.browser
+  const browser = await interaction.client.getBrowser()
   const page = await browser.newPage()
   await page.goto("https://aternos.org/servers")
   await page.waitForSelector(".servercard")

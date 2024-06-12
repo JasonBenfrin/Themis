@@ -6,7 +6,7 @@ export default async function list(interaction) {
   const embed = new EmbedBuilder()
     .setTitle("Server List")
     .setColor("#2b87d3")
-  const browser = interaction.client.browser
+  const browser = await interaction.client.getBrowser()
   const page = await browser.newPage()
   await page.goto("https://aternos.org/servers")
   await page.waitForSelector(".servercard")

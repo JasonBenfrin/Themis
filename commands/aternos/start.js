@@ -2,7 +2,7 @@ import { ActionRowBuilder, ComponentType, StringSelectMenuBuilder, StringSelectM
 
 export default async function start(interaction) {
   await interaction.deferReply()
-  const browser = interaction.client.browser
+  const browser = await interaction.client.getBrowser()
   const page = await browser.newPage()
   await page.goto("https://aternos.org/servers")
   await page.waitForSelector(".servercard")
