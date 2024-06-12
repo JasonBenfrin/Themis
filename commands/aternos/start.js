@@ -73,6 +73,7 @@ export default async function start(interaction) {
     message.edit({content: `Started ${ip}`, components:[]})
     collector.stop("end")
     await page.close()
+    browser.close()
   })
 
   collector.on('end', async (c, reason) => {
@@ -80,5 +81,6 @@ export default async function start(interaction) {
       message.edit({content: "Interaction expired", components:[]})
     }
     await page.close()
+    browser.close()
   })
 }

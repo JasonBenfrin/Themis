@@ -28,5 +28,6 @@ export default async function list(interaction) {
   }
   embed.setDescription(description)
   interaction.followUp({embeds: [embed]})
-  page.close()
+  await page.close()
+  browser.close()
 }

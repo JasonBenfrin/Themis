@@ -33,7 +33,9 @@ export async function execute(client) {
 
 	client.getBrowser = async function () {
 		if (this.browser !== undefined && (await this.browser.pages()).length > 0) return this.browser
-		this.browser = await puppeteer.launch()
+		this.browser = await puppeteer.launch({
+			headless: false
+		})
 		const page = await this.browser.newPage()
 		await page.goto("https://aternos.org/go")
 		await page.type('input.username', process.env.ATERNOS_USERNAME)
