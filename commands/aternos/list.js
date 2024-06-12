@@ -27,7 +27,7 @@ export default async function list(interaction) {
     description += `${emoji} **${name}**\n<:setting:1250080436479201380> **${software}**\n\n`
   }
   embed.setDescription(description)
-  interaction.followUp({embeds: [embed]})
+  await interaction.followUp({embeds: [embed]})
   await page.close()
   browser.close()
 }
