@@ -32,7 +32,6 @@ export async function execute(client) {
 	}))
 
 	client.getBrowser = async function () {
-		if (this.browser !== undefined && (await this.browser.pages()).length > 0) return this.browser
 		this.browser = await puppeteer.launch({
 			headless: !(process.env.DEBUG || false)
 		})
