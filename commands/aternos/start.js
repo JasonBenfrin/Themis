@@ -70,7 +70,6 @@ export default async function start(interaction) {
     await page.waitForSelector("#start")
     const ip = await page.evaluate('Object.values(document.querySelector(".server-ip").childNodes).filter(e => e.nodeType === 3).reduce((prev, curr) => prev + curr.textContent, "").trim()')
     await page.click("#start")
-    await page.waitForTimeout(1000)
     setTimeout(() => {
       message.edit({content: `Started ${ip}`, components:[]})
       collector.stop("end")
