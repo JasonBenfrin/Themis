@@ -94,8 +94,6 @@ export default async function detail(interaction) {
 
     message.edit({embeds: [embed], components:[]})
     collector.stop("end")
-    await page.close()
-    browser.close()
   })
 
   collector.on('end', async (c, reason) => {
